@@ -90,28 +90,123 @@ class HandlebarsTest extends \PHPUnit_Framework_TestCase
      */
     public function internalHelpersdataProvider()
     {
-        return array(
-            array(
+        return [
+            [
                 '{{#if data}}Yes{{/if}}',
-                array('data' => true),
+                ['data' => true],
                 'Yes'
-            ),
-            array(
+            ],
+            [
                 '{{#if data}}Yes{{/if}}',
-                array('data' => false),
+                ['data' => false],
                 ''
-            ),
-            array(
+            ],
+            [
+                '{{#unless data}}OK{{/unless}}',
+                ['data' => false],
+                'OK'
+            ],
+            [
                 '{{#with data}}{{key}}{{/with}}',
-                array('data' => array('key' => 'result')),
+                ['data' => ['key' => 'result']],
                 'result'
-            ),
-            array(
+            ],
+            [
                 '{{#each data}}{{this}}{{/each}}',
-                array('data' => array(1, 2, 3, 4)),
+                ['data' => [1, 2, 3, 4]],
                 '1234'
-            ),
-        );
+            ],
+            [
+                '{{#each data[0:2]}}{{this}}{{/each}}',
+                ['data' => [1, 2, 3, 4]],
+                '12'
+            ],
+            [
+                '{{#each data[1:2]}}{{this}}{{/each}}',
+                ['data' => [1, 2, 3, 4]],
+                '23'
+            ],
+            [
+                '{{#upper data}}',
+                ['data' => "hello"],
+                'HELLO'
+            ],
+            [
+                '{{#lower data}}',
+                ['data' => "HELlO"],
+                'hello'
+            ],
+            [
+                '{{#capitalize data}}',
+                ['data' => "hello"],
+                'Hello'
+            ],
+            [
+                '{{#capitalize_words data}}',
+                ['data' => "hello world"],
+                'Hello World'
+            ],
+            [
+                '{{#reverse data}}',
+                ['data' => "hello"],
+                'olleh'
+            ],
+            [
+                "{{#inflect count 'album' 'albums' }}",
+                ["count" => 1],
+                'album'
+            ],
+            [
+                "{{#inflect count 'album' 'albums' }}",
+                ["count" => 10],
+                'albums'
+            ],
+            [
+                "{{#inflect count '%d album' '%d albums' }}",
+                ["count" => 1],
+                '1 album'
+            ],
+            [
+                "{{#inflect count '%d album' '%d albums' }}",
+                ["count" => 10],
+                '10 albums'
+            ],
+            [
+                "{{#default data 'OK' }}",
+                ["data" => "hello"],
+                'hello'
+            ],
+            [
+                "{{#default data 'OK' }}",
+                [],
+                'OK'
+            ],
+            [
+                "{{#truncate data 8 '...'}}",
+                ["data" => "Hello World! How are you?"],
+                'Hello Wo...'
+            ],
+            [
+                "{{#raw}}I'm raw {{data}}{{/raw}}",
+                ["data" => "raw to be included, but won't :)"],
+                "I'm raw {{data}}"
+            ],
+            [
+                "{{#repeat 3}}Yes {{/repeat}}",
+                [],
+                "Yes Yes Yes "
+            ],
+            [
+                "{{#repeat 4}}Nice {{data}} {{/repeat}}",
+                ["data" => "Daddy!"],
+                "Nice Daddy! Nice Daddy! Nice Daddy! Nice Daddy! "
+            ],
+            [
+                "{{#define test}}I'm Defined and Invoked{{/define}}{{#invoke test}}",
+                [],
+                "I'm Defined and Invoked"
+            ],
+        ];
     }
 
     /**
@@ -138,7 +233,7 @@ class HandlebarsTest extends \PHPUnit_Framework_TestCase
         $engine->addHelper('test', function () {
             return 'Test helper is called';
         });
-        $this->assertEquals('Test helper is called', $engine->render('{{#test}}', array()));
+        $this->assertEquals('Test helper is called', $engine->render('{{#test}}', []));
     }
 
     /**

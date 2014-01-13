@@ -2,6 +2,7 @@
     "name": "voodoophp/handlebars",
     "description": "Handlebars processor for php",
     "homepage": "http://voodoophp.org/docs/handlebars",
+    "keywords": ["templating", "mustache", "handlebars"],
     "type": "library",
     "license": "MIT",
     "authors": [

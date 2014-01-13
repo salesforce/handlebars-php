@@ -1,8 +1,5 @@
 <?php
 /**
- * This file is part of Handlebars-php
- * Base on mustache-php https://github.com/bobthecow/mustache.php
- *
  * Handlebars base template
  * contain some utility method to get context and helpers
  *
@@ -14,9 +11,8 @@
  * @copyright 2012 (c) ParsPooyesh Co
  * @copyright 2013 (c) Behrooz Shabani
  * @copyright 2013 (c) Mardix
- * @license   MIT <http://opensource.org/licenses/MIT>
- * @version   GIT: $Id$
- * @link      http://xamin.ir
+ * @license   MIT
+ * @link      http://voodoophp.org/docs/handlebars
  */
 
 namespace Handlebars;
@@ -55,7 +51,7 @@ class Template
         $this->tree = $tree;
         $this->source = $source;
         array_push($this->stack, [0, $this->getTree(), false]);
-        
+
     }
 
     /**
@@ -200,7 +196,7 @@ class Template
      */
     public function discard()
     {
-        $topTree = end($this->stack); //This method never pop a value from stack   
+        $topTree = end($this->stack); //This method never pop a value from stack
         list($index, $tree, $stop) = $topTree;
         while (array_key_exists($index, $tree)) {
             $current = $tree[$index];
@@ -365,7 +361,7 @@ class Template
 
         return $value;
     }
-    
+
     public function __clone()
     {
         return $this;

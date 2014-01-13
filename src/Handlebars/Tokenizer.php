@@ -1,10 +1,5 @@
 <?php
 /**
- * This file is part of Mustache.php.
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- * Changes to match xamin-std and handlebars made by xamin team
- *
  * Handlebars tokenizer (based on mustache)
  *
  * @category  Xamin
@@ -16,9 +11,8 @@
  * @copyright 2012 (c) ParsPooyesh Co
  * @copyright 2013 (c) Behrooz Shabani
  * @copyright 2013 (c) Mardix
- * @license   MIT <http://opensource.org/licenses/mit-license.php>
- * @version   GIT: $Id$
- * @link      http://xamin.ir
+ * @license   MIT
+ * @link      http://voodoophp.org/docs/handlebars
  */
 
 namespace Handlebars;
@@ -154,8 +148,8 @@ class Tokenizer
                     // Sections (Helpers) can accept parameters
                     // Same thing for Partials (little known fact)
                     if (in_array($this->tagType, [
-                                    self::T_SECTION, 
-                                    self::T_PARTIAL, 
+                                    self::T_SECTION,
+                                    self::T_PARTIAL,
                                     self::T_PARTIAL_2]
                             )) {
                         $newBuffer = explode(' ', trim($this->buffer), 2);

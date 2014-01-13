@@ -1,9 +1,6 @@
 <?php
 /**
- * This file is part of Handlebars-php
- * Base on mustache-php https://github.com/bobthecow/mustache.php
- *
- * Handlebars helpers
+ * Helpers
  *
  * a collection of helper function. normally a function like
  * function ($sender, $name, $arguments) $arguments is unscaped arguments and
@@ -16,10 +13,9 @@
  * @author    Mardix <https://github.com/mardix>
  * @copyright 2012 (c) ParsPooyesh Co
  * @copyright 2013 (c) Behrooz Shabani
- * @copyright 2013 (c) Mardix
- * @license   MIT <http://opensource.org/licenses/MIT>
- * @version   GIT: $Id$
- * @link      http://xamin.ir
+ * @copyright 2014 (c) Mardix
+ * @license   MIT
+ * @link      http://voodoophp.org/docs/handlebars
  */
 
 namespace Handlebars;
@@ -27,6 +23,7 @@ namespace Handlebars;
 use DateTime;
 use InvalidArgumentException;
 use Traversable;
+use LogicException;
 
 class Helpers
 {
@@ -34,22 +31,26 @@ class Helpers
      * @var array array of helpers
      */
     protected $helpers = [];
+    private $tpl = [];
     protected $builtinHelpers = [
-        "if", 
+        "if",
         "each",
         "with",
         "unless",
         "bindAttr",
-        "upper",
-        "lower",
-        "capitalize",
-        "capitalize_words",
-        "reverse",
-        "format_date",
-        "inflect",
-        "default",
-        "truncate",
-        "raw"
+        "upper",                // Put all chars in uppercase
+        "lower",                // Put all chars in lowercase
+        "capitalize",           // Capitalize just the first word
+        "capitalize_words",     // Capitalize each words
+        "reverse",              // Reverse a string
+        "format_date",          // Format a date
+        "inflect",              // Inflect the wording based on count ie. 1 album, 10 albums
+        "default",              // If a variable is null, it will use the default instead
+        "truncate",             // Truncate section
+        "raw",                  // Return the source as is without converting
+        "repeat",               // Repeat a section
+        "define",               // Define a block to be used using "invoke"
+        "invoke",               // Invoke a block that was defined with "define"
     ];
 
     /**
@@ -215,7 +216,7 @@ class Helpers
     public function helperIf($template, $context, $args, $source)
     {
         $tmp = $context->get($args);
-        if ($tmp) {            
+        if ($tmp) {
             $template->setStopToken('else');
             $buffer = $template->render($context);
             $template->setStopToken(false);
@@ -250,16 +251,16 @@ class Helpers
     {
         list($keyname, $slice_start, $slice_end) = $this->extractSlice($args);
         $tmp = $context->get($keyname);
-    
+
         if (is_array($tmp) || $tmp instanceof Traversable) {
             $tmp = array_slice($tmp, $slice_start, $slice_end);
             $buffer = '';
             $islist = array_values($tmp) === $tmp;
-            
+
             if (is_array($tmp) && ! count($tmp)) {
                 return $this->renderElse($template, $context);
             } else {
-                foreach ($tmp as $key => $var) {                
+                foreach ($tmp as $key => $var) {
                     $tpl = clone $template;
                     if ($islist) {
                         $context->pushIndex($key);
@@ -282,7 +283,7 @@ class Helpers
             return $this->renderElse($template, $context);
         }
     }
-    
+
     /**
      * Applying the DRY principle here.
      * This method help us render {{else}} portion of a block
@@ -295,10 +296,10 @@ class Helpers
         $template->setStopToken('else');
         $template->discard();
         $template->setStopToken(false);
-        return $template->render($context);        
+        return $template->render($context);
     }
-    
-    
+
+
     /**
      * Create handler for the 'unless' helper.
      *
@@ -360,9 +361,11 @@ class Helpers
     {
         return $args;
     }
-    
+
     /**
      * To uppercase string
+     *
+     * {{#upper data}}
      *
      * @param \Handlebars\Template $template template that is being rendered
      * @param \Handlebars\Context  $context  context object
@@ -371,7 +374,7 @@ class Helpers
      *                                       within helper
      *
      * @return string
-     */    
+     */
     public function helperUpper($template, $context, $args, $source)
     {
         return strtoupper($context->get($args));
@@ -379,7 +382,9 @@ class Helpers
 
     /**
      * To lowercase string
-     * 
+     *
+     * {{#lower data}}
+     *
      * @param \Handlebars\Template $template template that is being rendered
      * @param \Handlebars\Context  $context  context object
      * @param array                $args     passed arguments to helper
@@ -387,7 +392,7 @@ class Helpers
      *                                       within helper
      *
      * @return string
-     */    
+     */
     public function helperLower($template, $context, $args, $source)
     {
         return strtolower($context->get($args));
@@ -396,6 +401,8 @@ class Helpers
     /**
      * to capitalize first letter
      *
+     * {{#capitalize}}
+     *
      * @param \Handlebars\Template $template template that is being rendered
      * @param \Handlebars\Context  $context  context object
      * @param array                $args     passed arguments to helper
@@ -403,7 +410,7 @@ class Helpers
      *                                       within helper
      *
      * @return string
-     */    
+     */
     public function helperCapitalize($template, $context, $args, $source)
     {
         return ucfirst($context->get($args));
@@ -412,6 +419,8 @@ class Helpers
     /**
      * To capitalize first letter in each word
      *
+     * {{#capitalize_words data}}
+     *
      * @param \Handlebars\Template $template template that is being rendered
      * @param \Handlebars\Context  $context  context object
      * @param array                $args     passed arguments to helper
@@ -419,7 +428,7 @@ class Helpers
      *                                       within helper
      *
      * @return string
-     */    
+     */
     public function helperCapitalizeWords($template, $context, $args, $source)
     {
         return ucwords($context->get($args));
@@ -428,6 +437,8 @@ class Helpers
     /**
      * To reverse a string
      *
+     * {{#reverse data}}
+     *
      * @param \Handlebars\Template $template template that is being rendered
      * @param \Handlebars\Context  $context  context object
      * @param array                $args     passed arguments to helper
@@ -435,15 +446,17 @@ class Helpers
      *                                       within helper
      *
      * @return string
-     */    
+     */
     public function helperReverse($template, $context, $args, $source)
     {
         return strrev($context->get($args));
-    } 
-    
+    }
+
     /**
      * Format a date
+     *
      * {{#format_date date 'Y-m-d @h:i:s'}}
+     *
      * @param \Handlebars\Template $template template that is being rendered
      * @param \Handlebars\Context  $context  context object
      * @param array                $args     passed arguments to helper
@@ -470,11 +483,12 @@ class Helpers
         } else {
             return $date;
         }
-    }  
-    
+    }
+
     /**
      * {{inflect count 'album' 'albums'}}
      * {{inflect count '%d album' '%d albums'}}
+     *
      * @param \Handlebars\Template $template template that is being rendered
      * @param \Handlebars\Context  $context  context object
      * @param array                $args     passed arguments to helper
@@ -492,12 +506,12 @@ class Helpers
         $value = $context->get($keyname);
         $inflect = ($value <= 1) ? $singular : $plurial;
         return sprintf($inflect, $value);
-    } 
-    
+    }
+
    /**
      * Provide a default fallback
-     * {{default title "No title available"}} 
-     * 
+    *
+     * {{default title "No title available"}}
      *
      * @param \Handlebars\Template $template template that is being rendered
      * @param \Handlebars\Context  $context  context object
@@ -506,20 +520,20 @@ class Helpers
      *                                       within helper
      *
      * @return string
-     */    
+     */
     public function helperDefault($template, $context, $args, $source)
     {
         preg_match("/(.*?)\s+(?:(?:\"|\')(.*?)(?:\"|\'))/", trim($args), $m);
         $keyname = $m[1];
-        $default = $m[2];        
+        $default = $m[2];
         $value = $context->get($keyname);
         return ($value) ?: $default;
     }
-    
+
    /**
      * Truncate a string to a length, and append and ellipsis if provided
-     * {{#truncate content 5 "..."}} 
-     * 
+     * {{#truncate content 5 "..."}}
+     *
      *
      * @param \Handlebars\Template $template template that is being rendered
      * @param \Handlebars\Context  $context  context object
@@ -528,7 +542,7 @@ class Helpers
      *                                       within helper
      *
      * @return string
-     */    
+     */
     public function helperTruncate($template, $context, $args, $source)
     {
         preg_match("/(.*?)\s+(.*?)\s+(?:(?:\"|\')(.*?)(?:\"|\'))/", trim($args), $m);
@@ -540,9 +554,11 @@ class Helpers
             $value .= $ellipsis;
         }
         return $value;
-    }    
-    
+    }
+
     /**
+     * Return the data source as is
+     *
      * {{#raw}} {{/raw}}
      *
      * @param \Handlebars\Template $template template that is being rendered
@@ -557,18 +573,99 @@ class Helpers
     {
         return $source;
     }
-    
+
+    /**
+     * Repeat section $x times.
+     *
+     * {{#repeat 10}}
+     *      This section will be repeated 10 times
+     * {{/repeat}}
+     *
+     *
+     * @param \Handlebars\Template $template template that is being rendered
+     * @param \Handlebars\Context  $context  context object
+     * @param array                $args     passed arguments to helper
+     * @param string               $source   part of template that is wrapped
+     *                                       within helper
+     *
+     * @return string
+     */
+    public function helperRepeat($template, $context, $args, $source)
+    {
+        $buffer = $template->render($context);
+        return str_repeat($buffer, intval($args));
+    }
+
+
+    /**
+     * Define a section to be used later by using 'invoke'
+     *
+     * --> Define a section: hello
+     * {{#define hello}}
+     *      Hello World!
+     *
+     *      How is everything?
+     * {{/define}}
+     *
+     * --> This is how it is called
+     * {{#invoke hello}}
+     *
+     *
+     * @param \Handlebars\Template $template template that is being rendered
+     * @param \Handlebars\Context  $context  context object
+     * @param array                $args     passed arguments to helper
+     * @param string               $source   part of template that is wrapped
+     *                                       within helper
+     *
+     * @return null
+     */
+    public function helperDefine($template, $context, $args, $source)
+    {
+        $this->tpl["DEFINE"][$args] = clone($template);
+    }
+
+    /**
+     * Invoke a section that was created using 'define'
+     *
+     * --> Define a section: hello
+     * {{#define hello}}
+     *      Hello World!
+     *
+     *      How is everything?
+     * {{/define}}
+     *
+     * --> This is how it is called
+     * {{#invoke hello}}
+     *
+     *
+     * @param \Handlebars\Template $template template that is being rendered
+     * @param \Handlebars\Context  $context  context object
+     * @param array                $args     passed arguments to helper
+     * @param string               $source   part of template that is wrapped
+     *                                       within helper
+     *
+     * @return null
+     */
+    public function helperInvoke($template, $context, $args, $source)
+    {
+        if (! isset($this->tpl["DEFINE"][$args])) {
+            throw new LogicException("Can't INVOKE '{$args}'. '{$args}' was not DEFINE ");
+        }
+        return $this->tpl["DEFINE"][$args]->render($context);
+    }
+
+
     /**
      * Change underscore helper name to CamelCase
-     * 
+     *
      * @param string $string
      * @return string
      */
     private function underscoreToCamelCase($string)
     {
         return str_replace(' ', '', ucwords(str_replace('_', ' ', $string)));
-    } 
-    
+    }
+
     /**
      * slice
      * Allow to split the data that will be returned
@@ -576,23 +673,23 @@ class Helpers
      * #loop[start:] = Starts at start though the rest of the array
      * #loop[:end] = Starts at the beginning through end -1
      * #loop[:] = A copy of the whole array
-     * 
+     *
      * #loop[-1]
      * #loop[-2:] = Last two items
      * #loop[:-2] = Everything except last two items
-     * 
+     *
      * @param string $string
      * @return Array [tag_name, slice_start, slice_end]
-     */    
-    private function extractSlice($string) 
+     */
+    private function extractSlice($string)
     {
-        preg_match("/^([\w\._\-]+)(?:\[([\-0-9]*?:[\-0-9]*?)\])?/i", $string, $m);  
+        preg_match("/^([\w\._\-]+)(?:\[([\-0-9]*?:[\-0-9]*?)\])?/i", $string, $m);
         $slice_start = $slice_end = null;
         if (isset($m[2])) {
             list($slice_start, $slice_end) = explode(":", $m[2]);
             $slice_start = (int) $slice_start;
             $slice_end = $slice_end ? (int) $slice_end : null;
-        } 
+        }
         return [$m[1], $slice_start, $slice_end];
-    }     
+    }
 }

@@ -1,9 +1,5 @@
 <?php
 /**
- * This file is part of Handlebars-php
- * Base on mustache-php https://github.com/bobthecow/mustache.php
- * re-write to use with handlebars
- *
  * Handlebars parser (based on mustache)
  *
  * This class is responsible for turning raw template source into a set of
@@ -17,9 +13,8 @@
  * @copyright 2012 (c) ParsPooyesh Co
  * @copyright 2013 (c) Behrooz Shabani
  * @copyright 2013 (c) Mardix
- * @license   MIT <http://opensource.org/licenses/MIT>
- * @version   GIT: $Id$
- * @link      http://xamin.ir
+ * @license   MIT
+ * @link      http://voodoophp.org/docs/handlebars
  */
 
 namespace Handlebars;

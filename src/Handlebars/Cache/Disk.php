@@ -1,8 +1,5 @@
 <?php
 /**
- * This file is part of Handlebars-php
- * Base on mustache-php https://github.com/bobthecow/mustache.php
- *
  * A flat-file filesystem cache.
  *
  * @category  Xamin
@@ -13,9 +10,8 @@
  * @copyright 2013 (c) Brokerloop, Inc.
  * @copyright 2013 (c) Behrooz Shabani
  * @copyright 2013 (c) Mardix
- * @license   MIT <http://opensource.org/licenses/MIT>
- * @version   GIT: $Id$
- * @link      http://xamin.ir
+ * @license   MIT
+ * @link      http://voodoophp.org/docs/handlebars
  */
 
 namespace Handlebars\Cache;

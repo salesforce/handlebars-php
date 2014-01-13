@@ -1,43 +1,50 @@
-#Handlebars.php
+[![Build Status](https://travis-ci.org/mardix/handlebars.png?branch=master)](https://travis-ci.org/mardix/handlebars)
+[![Scrutinizer Quality Score](https://scrutinizer-ci.com/g/mardix/handlebars/badges/quality-score.png?s=23a379f19b523498926eb3f2b60195815632e8ef)](https://scrutinizer-ci.com/g/mardix/handlebars/)
+[![Code Coverage](https://scrutinizer-ci.com/g/mardix/handlebars/badges/coverage.png?s=9d6acd80ef2bda03cbd00a0cff35535614ce79ed)](https://scrutinizer-ci.com/g/mardix/handlebars/)
+
+---
+
+#Handlebars
 
 ---
 
 #### A simple, logic-less, yet powerful templating engine for PHP
 
 ---
- 
-Name: **Handlebars.php**
+
+Name: **Handlebars**
 
 License: MIT
 
-Version : 2.x.x
+Version : 2.1.x
 
 Requirements: PHP >= 5.4
 
 ---
 
 
-## About Handlebars.php
+## About Handlebars
 
-Handlebars.php provides the power necessary to let you build semantic templates effectively with no frustration, that keep the view and the code separated like we all know they should be.
+Handlebars provides the power necessary to let you build semantic templates effectively with no frustration,
+that keep the view and the code separated like we all know they should be.
 
 
-Fork of: [Handlebars.php by XaminProject](https://github.com/XaminProject/handlebars.php)
+Fork of: [Handlebars.php by XaminProject](https://github.com/mardix/handlebars)
 
-Handlebars.php, is the PHP port of [Handlebars.js](http://handlebarsjs.com/)
+Handlebars, is the PHP port of [Handlebars.js](http://handlebarsjs.com/)
 
 Extended docs can be found at [VoodooPHP.org/docs/handlebars](http://voodoophp.org/docs/handlebars)
 
 ---
 
-## Install Handlebars.php
+## Install Handlebars
 
 
-You can just download Handlebars.php as is, or with Composer. 
+You can just download Handlebars.php as is, or with Composer.
 
 To install with composer, add the following in the require key in your **composer.json** file
 
-	"voodoophp/handlebars.php": "2.*"
+	"voodoophp/handlebars": "2.*"
 
 composer.json
 
@@ -46,7 +53,7 @@ composer.json
 	    "name": "myapp/name",
 	    "description": "My awesome app name",
 	    "require": {
-	        "voodoophp/handlebars.php": "2.*"
+	        "voodoophp/handlebars": "2.*"
 	    }
 	}
 
@@ -54,9 +61,9 @@ composer.json
 
 ## Getting Started
 
-At the minimum, we are required to have an array model and a template string. Alternatively we can have a file containing handlebars (or html, text, etc) expression. 
+At the minimum, we are required to have an array model and a template string. Alternatively we can have a file containing handlebars (or html, text, etc) expression.
 
-  
+
 
 #### Template
 
@@ -76,7 +83,7 @@ The string above can be used as is in your PHP file, or be put in a file (ie: */
 
 #### PHP file
 
-Now the we've created our template file, in a php file (index.php) we'll create the data to passed to the model. The model is a key/value array. 
+Now the we've created our template file, in a php file (index.php) we'll create the data to passed to the model. The model is a key/value array.
 
 Below we are going to create the Handlebars object, set the partials loader, and put some data in the model.
 
@@ -86,16 +93,16 @@ Below we are going to create the Handlebars object, set the partials loader, and
 		# With composer we can autoload the Handlebars package
 		require_once ("./vendor/autoload.php");
 
-		# If not using composer, you can still load it manually.  
+		# If not using composer, you can still load it manually.
 		# require 'src/Handlebars/Autoloader.php';
 		# Handlebars\Autoloader::register();
-		
+
 		use Handlebars\Handlebars;
 		use Handlebars\Loader\FilesystemLoader;
 
 		# Set the partials files
 		$partialsDir = __DIR__."/templates"
-		$partialsLoader = new FilesystemLoader($partialsDir, 
+		$partialsLoader = new FilesystemLoader($partialsDir,
 												[
 													"extension" => "html"
 												]
@@ -109,7 +116,7 @@ Below we are going to create the Handlebars object, set the partials loader, and
 
 		# Will render the model to the templates/main.tpl template
 		echo $handlebars->render("main", $model);
-	
+
 
 #### Assign Data
 
@@ -142,7 +149,7 @@ The simplest way to assign data is to create an Array model. The model will cont
 
 #### Render Template
 
-Use the method `Handlebars\Handlebars::render($template, $model)` to render you template once everything is created. 
+Use the method `Handlebars\Handlebars::render($template, $model)` to render you template once everything is created.
 
 ***$template*** : Template can be the name of the file or a string containing the handlebars/html.
 
@@ -193,7 +200,7 @@ Handlebars expressions are the basic unit of a Handlebars template. You can use 
 
 
 The simplest Handlebars expression is a simple identifier:
-	
+
 	{{title}}
 
 	-> I'm Title
@@ -252,7 +259,7 @@ You can use the if helper to conditionally render a block. If its argument retur
 
 	{{#if isActive}}
 		This part will be shown if it is active
-	{{else}}	
+	{{else}}
 		This part will not show if isActive is true
 	{{/if}}
 
@@ -273,8 +280,8 @@ You can use the unless helper as the inverse of the if helper. Its block will be
 
 	{{#unless isActive}}
 		This part will not show if isActive is true
-	{{/unless}}	
-			
+	{{/unless}}
+
 
 ---
 ##Iterators: EACH
@@ -318,7 +325,7 @@ You can iterate over a list using the built-in each helper. Inside the block, yo
                     "Bugatti",
                     "Rolls Royce"
                 ]
-            ],    
+            ],
         ];
 
 
@@ -326,8 +333,8 @@ You can iterate over a list using the built-in each helper. Inside the block, yo
 			{{#each genres}}
 			    {{.}}
 			{{/each}}
-			
-			
+
+
 			{{#each cars}}
 			    <h3>{{category}}</h3>
 			    Total: {{count}}
@@ -382,7 +389,7 @@ When looping through items in each, you can optionally reference the current loo
 
 	{{#each array}}
 	  {{@index}}: {{this}}
-	{{/each}} 
+	{{/each}}
 
 
 	{{#each object}}
@@ -415,7 +422,7 @@ You can shift the context for a section of a template by using the built-in with
 	            ]
 			]
 		];
-		
+
 		<h2>All genres:</h2>
 	    {{#with other_genres}}
 	        {{#each genres}}
@@ -431,7 +438,7 @@ You can shift the context for a section of a template by using the built-in with
 
 		{{#if isActive}}
 			This part will be shown if it is active
-		{{else}}	
+		{{else}}
 			This part will not show if isActive is true
 		{{/if}}
 
@@ -459,7 +466,7 @@ You can shift the context for a section of a template by using the built-in with
 
 ## Other Helpers
 
-#### For convenience, a few more helpers were added in PHP to facilate some string formatting.
+#### For convenience, Voodoo\Handlebars added some extra helpers.
 
 ---
 
@@ -469,26 +476,26 @@ To format string to uppercase
 
 	{{#upper title}}
 
-### Lower 
+### Lower
 
 To format string to lowercase
 
 	{{#lower title}}
 
 
-### Capitalize 
+### Capitalize
 
 To capitalize the first letter
-	
+
 	{{#capitalize title}}
 
-### Capitalize_Words 
+### Capitalize_Words
 
 To capitalize each words in a string
 
 	{{#capitalize_words title}}
 
-### Reverse 
+### Reverse
 
 To reverse the order of string
 
@@ -501,14 +508,14 @@ To format date: `{{#format_date date '$format'}}`
 	{{#format_date date 'Y-m-d H:i:s'}}
 
 
-### Inflect 
+### Inflect
 
 To singularize or plurialize words based on count `{{#inflect count $singular $plurial}}`
 
 	{{#inflect count '%d book' '%d books'}}
 
 
-### Truncate 
+### Truncate
 
 To truncate a string: `{{#truncate title $length $ellipsis}}`
 
@@ -540,6 +547,34 @@ This helper return handlebars expression as is. The expression will not be parse
 	{{/each}}
 
 
+### Repeat
+
+To truncate a string: `{{#repeat $count}}{{/repeat}}`
+
+        {{#repeat 5}}
+            Hello World!
+        {{/repeat}}
+
+Variable and blocks can still be used
+
+        {{#repeat 5}}
+            Hello {{name}}!
+        {{/repeat}}
+
+
+### Define & Invoke : Allow to define a block of content and use it later. It helps follow the DRY (Don't repeat yourself) principle
+ `{{#define $definedName}}content{{/define}} {{#invoke $definedName}}`
+
+        {{#define hello}}
+            Hello World! How do you do?
+        {{/define}}
+
+        {{#invoke hello}}
+
+->
+
+        Hello World! How do you do?
+
 ---
 
 ### Template Comments
@@ -569,11 +604,11 @@ To create your own helper, use the method: `Handlebars::addHelper($name, $callba
 
 The following helper will UPPERCASE a string
 
-	$handlebars->addHelper("upper", 
-							function($template, $context, $args, $source){
-	                        	return strtoupper($context->get($args));
+	$handlebars->addHelper("upper",
+                                function($template, $context, $args, $source){
+                                    return strtoupper($context->get($args));
 	                    	}
-						);
+                            );
 
 And now we can use the helper like this:
 
@@ -583,7 +618,7 @@ And now we can use the helper like this:
 
 
 
-#### Who's using Handlebars.php
+#### Who's using Handlebars
 
 
 * [VoodooPHP](http://voodoophp.org)
@@ -592,9 +627,9 @@ And now we can use the helper like this:
 
 #### Credits
 
-* Fork of [Handlebars.php by XaminProject](https://github.com/XaminProject/handlebars.php)
+* Fork of [Handlebars.php by XaminProject](https://github.com/mardix/handlebars)
 
-* The documentation was edited by [Mardix](http://github.com/mardix). 
+* The documentation was edited by [Mardix](http://github.com/mardix).
 
 
 ####Contribution
