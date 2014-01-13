@@ -562,8 +562,22 @@ Variable and blocks can still be used
         {{/repeat}}
 
 
-### Define & Invoke : Allow to define a block of content and use it later. It helps follow the DRY (Don't repeat yourself) principle
- `{{#define $definedName}}content{{/define}} {{#invoke $definedName}}`
+### Define/Invoke
+
+Allow to define a block of content and use it later. It helps follow the DRY (Don't repeat yourself) principle.
+
+
+Define
+
+        {{#define $definedName}}
+            content
+        {{/define}}
+
+Invoke
+        {{#invoke $definedName}}
+
+
+Example:
 
         {{#define hello}}
             Hello World! How do you do?
