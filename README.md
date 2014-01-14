@@ -1,6 +1,4 @@
-[![Build Status](https://travis-ci.org/mardix/handlebars.png?branch=master)](https://travis-ci.org/mardix/handlebars)
-[![Scrutinizer Quality Score](https://scrutinizer-ci.com/g/mardix/handlebars/badges/quality-score.png?s=23a379f19b523498926eb3f2b60195815632e8ef)](https://scrutinizer-ci.com/g/mardix/handlebars/)
-[![Code Coverage](https://scrutinizer-ci.com/g/mardix/handlebars/badges/coverage.png?s=9d6acd80ef2bda03cbd00a0cff35535614ce79ed)](https://scrutinizer-ci.com/g/mardix/handlebars/)
+[![Build Status](https://travis-ci.org/mardix/Handlebars.png?branch=master)](https://travis-ci.org/mardix/Handlebars)
 
 ---
 
@@ -29,7 +27,7 @@ Handlebars provides the power necessary to let you build semantic templates effe
 that keep the view and the code separated like we all know they should be.
 
 
-Fork of: [Handlebars.php by XaminProject](https://github.com/mardix/handlebars)
+Fork of: [Handlebars.php by XaminProject](https://github.com/XaminProject/handlebars.php)
 
 Handlebars, is the PHP port of [Handlebars.js](http://handlebarsjs.com/)
 
@@ -574,6 +572,7 @@ Define
         {{/define}}
 
 Invoke
+
         {{#invoke $definedName}}
 
 
@@ -641,7 +640,7 @@ And now we can use the helper like this:
 
 #### Credits
 
-* Fork of [Handlebars.php by XaminProject](https://github.com/mardix/handlebars)
+* Fork of [Handlebars.php by XaminProject](https://github.com/XaminProject/handlebars.php)
 
 * The documentation was edited by [Mardix](http://github.com/mardix).
 
