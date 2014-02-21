@@ -23,7 +23,7 @@ use InvalidArgumentException;
 class Handlebars
 {
     private static $instance = null;
-    const VERSION = '2.1';
+    const VERSION = '2.2';
 
     /**
      * factory method

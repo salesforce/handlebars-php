@@ -107,6 +107,11 @@ class HandlebarsTest extends \PHPUnit_Framework_TestCase
                 'OK'
             ],
             [
+                '{{#unless data}}OK {{else}}I believe{{/unless}}',
+                ['data' => false],
+                'I believe'
+            ],
+            [
                 '{{#with data}}{{key}}{{/with}}',
                 ['data' => ['key' => 'result']],
                 'result'

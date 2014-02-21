@@ -14,7 +14,7 @@ Name: **Handlebars**
 
 License: MIT
 
-Version : 2.1.x
+Version : 2.2.x
 
 Requirements: PHP >= 5.4
 
@@ -443,6 +443,8 @@ You can shift the context for a section of a template by using the built-in with
 ### Unless
 		{{#unless isActive}}
 			This part will show when isActive is false
+                {{else}}
+                        Otherwise this one will show
 		{{/unless}}
 
 ### Each

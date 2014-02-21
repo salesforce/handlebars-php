@@ -202,8 +202,11 @@ class Helpers
     /**
      * Create handler for the 'if' helper.
      *
-     * Needed for compatibility with PHP 5.2 since it doesn't support anonymous
-     * functions.
+     * {{#if condition}}
+     *      Something here
+     * {{else}}
+     *      something else here
+     * {{/if}}
      *
      * @param \Handlebars\Template $template template that is being rendered
      * @param \Handlebars\Context  $context  context object
@@ -302,7 +305,11 @@ class Helpers
 
     /**
      * Create handler for the 'unless' helper.
-     *
+     * {{#unless condition}}
+     *      Something here
+     * {{else}}
+     *      something else here
+     * {{/unless}}
      * @param \Handlebars\Template $template template that is being rendered
      * @param \Handlebars\Context  $context  context object
      * @param array                $args     passed arguments to helper
@@ -314,11 +321,15 @@ class Helpers
     public function helperUnless($template, $context, $args, $source)
     {
         $tmp = $context->get($args);
-        $buffer = '';
-        if (!$tmp) {
+        if ($tmp) {
+            $template->setStopToken('else');
             $buffer = $template->render($context);
+            $template->setStopToken(false);
+            $template->discard();
+            return $buffer;
+        } else {
+            return $this->renderElse($template, $context);
         }
-        return $buffer;
     }
 
     /**
