@@ -219,7 +219,7 @@ class Helpers
     public function helperIf($template, $context, $args, $source)
     {
         $tmp = $context->get($args);
-        if ($tmp) {
+        if (!$tmp) {
             $template->setStopToken('else');
             $buffer = $template->render($context);
             $template->setStopToken(false);
