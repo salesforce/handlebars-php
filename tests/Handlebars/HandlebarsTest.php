@@ -108,7 +108,7 @@ class HandlebarsTest extends \PHPUnit_Framework_TestCase
             ],
             [
                 '{{#unless data}}OK {{else}}I believe{{/unless}}',
-                ['data' => false],
+                ['data' => true],
                 'I believe'
             ],
             [
