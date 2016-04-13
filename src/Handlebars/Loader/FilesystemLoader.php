@@ -15,7 +15,7 @@
 
 namespace Handlebars\Loader;
 use Handlebars\Loader;
-use Handlebars\String;
+use Handlebars\HandlebarsString;
 
 
 class FilesystemLoader implements Loader
@@ -78,7 +78,7 @@ class FilesystemLoader implements Loader
      *
      * @param string $name template name
      *
-     * @return String Handlebars Template source
+     * @return HandlebarsString Handlebars Template source
      */
     public function load($name)
     {
@@ -86,7 +86,7 @@ class FilesystemLoader implements Loader
             $this->_templates[$name] = $this->loadFile($name);
         }
 
-        return new String($this->_templates[$name]);
+        return new HandlebarsString($this->_templates[$name]);
     }
 
     /**

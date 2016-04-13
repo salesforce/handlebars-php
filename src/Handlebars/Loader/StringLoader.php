@@ -16,7 +16,7 @@
 
 namespace Handlebars\Loader;
 use Handlebars\Loader;
-use Handlebars\String;
+use Handlebars\HandlebarsString;
 
 class StringLoader implements Loader
 {
@@ -26,11 +26,11 @@ class StringLoader implements Loader
      *
      * @param string $name Handlebars Template source
      *
-     * @return String Handlebars Template source
+     * @return HandlebarsString Handlebars Template source
      */
     public function load($name)
     {
-        return new String($name);
+        return new HandlebarsString($name);
     }
 
 }

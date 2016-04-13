@@ -561,7 +561,7 @@ class Helpers
         $limit = $m[2];
         $ellipsis = $m[3];
         $value = substr($context->get($keyname), 0, $limit);
-        if ($ellipsis) {
+        if ($ellipsis && strlen($context->get($keyname)) > $limit) {
             $value .= $ellipsis;
         }
         return $value;
