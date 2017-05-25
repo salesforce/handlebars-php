@@ -16,7 +16,7 @@
 
 namespace Handlebars;
 
-class String
+class HandlebarsString
 {
     private $string = "";
 
