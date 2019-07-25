@@ -1,8 +1,6 @@
-[![Build Status](https://travis-ci.org/mardix/Handlebars.png?branch=master)](https://travis-ci.org/mardix/Handlebars)
-
 ---
 
-#Handlebars
+#handlebars-php
 
 ---
 
@@ -10,11 +8,9 @@
 
 ---
 
-Name: **Handlebars**
+Name: **handlebars-php**
 
 License: MIT
-
-Version : 2.2.x
 
 Requirements: PHP >= 5.4
 
@@ -27,11 +23,9 @@ Handlebars provides the power necessary to let you build semantic templates effe
 that keep the view and the code separated like we all know they should be.
 
 
-Fork of: [Handlebars.php by XaminProject](https://github.com/XaminProject/handlebars.php)
+Fork of: [Handlebars.php by XaminProject](https://github.com/mardix/Handlebars)
 
 Handlebars, is the PHP port of [Handlebars.js](http://handlebarsjs.com/)
-
-Extended docs can be found at [VoodooPHP.org/docs/handlebars](http://voodoophp.org/docs/handlebars)
 
 ---
 
@@ -42,7 +36,7 @@ You can just download Handlebars.php as is, or with Composer.
 
 To install with composer, add the following in the require key in your **composer.json** file
 
-	"voodoophp/handlebars": "2.*"
+	"salesforce/handlebars-php": "1.*"
 
 composer.json
 
@@ -51,7 +45,7 @@ composer.json
 	    "name": "myapp/name",
 	    "description": "My awesome app name",
 	    "require": {
-	        "voodoophp/handlebars": "2.*"
+	        "salesforce/handlebars-php": "1.*"
 	    }
 	}
 
@@ -69,12 +63,12 @@ Handlebars templates look like regular HTML, with embedded handlebars expression
 
 Handlebars HTML-escapes values returned by a {{expression}}.
 
-		<div class="entry">
-		  <h1>{{title}}</h1>
-		  <div class="body">
-		    Hello, my name is {{name}}
-		  </div>
-		</div>
+	<div class="entry">
+	  <h1>{{title}}</h1>
+	  <div class="body">
+	    Hello, my name is {{name}}
+	  </div>
+	</div>
 
 
 The string above can be used as is in your PHP file, or be put in a file (ie: */templates/main.tpl*), to be called upon rendering.
@@ -101,16 +95,16 @@ Below we are going to create the Handlebars object, set the partials loader, and
 		# Set the partials files
 		$partialsDir = __DIR__."/templates"
 		$partialsLoader = new FilesystemLoader($partialsDir,
-												[
-													"extension" => "html"
-												]
-											);
+			[
+				"extension" => "html"
+			]
+		);
 
 		# We'll use $handlebars thoughout this the examples, assuming the will be all set this way
 		$handlebars = new Handlebars([
-						"loader" => $partialsLoader,
-						"partials_loader" => $partialsLoader
-					]);
+			"loader" => $partialsLoader,
+			"partials_loader" => $partialsLoader
+		]);
 
 		# Will render the model to the templates/main.tpl template
 		echo $handlebars->render("main", $model);
@@ -123,24 +117,24 @@ The simplest way to assign data is to create an Array model. The model will cont
 	<?php
 
 	$model = [
-		"name" => "Mardix",
+		"name" => "Yolo Baggins",
 		"title" => "I'm Title",
-        "permalink" => "blog/",
+        	"permalink" => "blog/",
 		"foo" => "bar",
 		"article" => [
 			"title" => "My Article Title"
 		],
 		"posts" => [
-            [
-                "title" => "Post #1",
-                "id" => 1,
-                "content" => "Content"
-            ],
-            [
-                "title" => "Post 2",
-                "id" => 2,
-                "content" => "Content"
-            ]
+		    [
+			"title" => "Post #1",
+			"id" => 1,
+			"content" => "Content"
+		    ],
+		    [
+			"title" => "Post 2",
+			"id" => 2,
+			"content" => "Content"
+		    ]
 		]
 	];
 
@@ -315,33 +309,26 @@ You can iterate over a list using the built-in each helper. Inside the block, yo
                 "list" => [
                     "Mercedes Benz",
                     "BMW"
-                ],
-                "category" => "Rich People Shit",
-                "count" => 3,
-                "list" => [
-                    "Ferrari",
-                    "Bugatti",
-                    "Rolls Royce"
                 ]
             ],
         ];
 
 
-			<h2>All genres:</h2>
-			{{#each genres}}
+		<h2>All genres:</h2>
+		{{#each genres}}
+		    {{.}}
+		{{/each}}
+
+
+		{{#each cars}}
+		    <h3>{{category}}</h3>
+		    Total: {{count}}
+		    <ul>
+			{{#each list}}
 			    {{.}}
 			{{/each}}
-
-
-			{{#each cars}}
-			    <h3>{{category}}</h3>
-			    Total: {{count}}
-			    <ul>
-			        {{#each list}}
-			            {{.}}
-			        {{/each}}
-			    </ul>
-			{{/each}}
+		    </ul>
+		{{/each}}
 		";
 
 		echo $engine->render($template, $model)
@@ -364,7 +351,7 @@ You can optionally provide an {{else}} section which will display only when the 
 
 The #each helper (php only) also has the ability to slice the data
 
- * {{#each Array[start:end]}} = starts at start trhough end -1
+ * {{#each Array[start:end]}} = starts at start through end -1
  * {{#each Array[start:]}} = Starts at start though the rest of the array
  * {{#each Array[:end]}} = Starts at the beginning through end -1
  * {{#each Array[:]}} = A copy of the whole array
@@ -411,21 +398,21 @@ You can shift the context for a section of a template by using the built-in with
                 "Techno",
                 "Country"
             ],
-			"other_genres" => [
-	            "genres" => [
-	                "Hip-Hop",
-	                "Rap",
-	                "Techno",
-	                "Country"
-	            ]
-			]
-		];
+	"other_genres" => [
+	    "genres" => [
+		"Hip-Hop",
+		"Rap",
+		"Techno",
+		"Country"
+	    ]
+		]
+	];
 
-		<h2>All genres:</h2>
+	<h2>All genres:</h2>
 	    {{#with other_genres}}
-	        {{#each genres}}
-	            {{.}}
-	        {{/each}}
+		{{#each genres}}
+		    {{.}}
+		{{/each}}
 	    {{/with}}
 
 ---
@@ -433,34 +420,32 @@ You can shift the context for a section of a template by using the built-in with
 ## Handlebars Built-in Helpers
 
 ### If
-
-		{{#if isActive}}
-			This part will be shown if it is active
-		{{else}}
-			This part will not show if isActive is true
-		{{/if}}
+	{{#if isActive}}
+		This part will be shown if it is active
+	{{else}}
+		This part will not show if isActive is true
+	{{/if}}
 
 ### Unless
-		{{#unless isActive}}
-			This part will show when isActive is false
-                {{else}}
-                        Otherwise this one will show
-		{{/unless}}
+	{{#unless isActive}}
+		This part will show when isActive is false
+	{{else}}
+		Otherwise this one will show
+	{{/unless}}
 
 ### Each
-		{{#each genres[0:10]}}
-		    {{.}}
-		{{else}}
-			No genres found!
-		{{/each}}
+	{{#each genres[0:10]}}
+	    {{.}}
+	{{else}}
+		No genres found!
+	{{/each}}
 
 ### With
-
-	    {{#with other_genres}}
-	        {{#each genres}}
-	            {{.}}
-	        {{/each}}
-	    {{/with}}
+    {{#with other_genres}}
+	{{#each genres}}
+	    {{.}}
+	{{/each}}
+    {{/with}}
 
 ---
 
@@ -507,13 +492,11 @@ To format date: `{{#format_date date '$format'}}`
 
 	{{#format_date date 'Y-m-d H:i:s'}}
 
-
 ### Inflect
 
 To singularize or plurialize words based on count `{{#inflect count $singular $plurial}}`
 
 	{{#inflect count '%d book' '%d books'}}
-
 
 ### Truncate
 
@@ -521,14 +504,11 @@ To truncate a string: `{{#truncate title $length $ellipsis}}`
 
 	{{#truncate title 21 '...'}}
 
-
 ### Default
 
 To use a default value if  the string is empty: `{{#default title $defaultValue}}`
 
 	{{#default title 'No title'}}
-
-
 
 ### Raw
 
@@ -620,10 +600,10 @@ To create your own helper, use the method: `Handlebars::addHelper($name, $callba
 The following helper will UPPERCASE a string
 
 	$handlebars->addHelper("upper",
-                                function($template, $context, $args, $source){
-                                    return strtoupper($context->get($args));
-	                    	}
-                            );
+		function($template, $context, $args, $source){
+		    return strtoupper($context->get($args));
+		}
+	    );
 
 And now we can use the helper like this:
 
@@ -632,19 +612,9 @@ And now we can use the helper like this:
 ---
 
 
-
-#### Who's using Handlebars
-
-
-* [VoodooPHP](http://voodoophp.org)
-
-
-
 #### Credits
 
 * Fork of [Handlebars.php by XaminProject](https://github.com/XaminProject/handlebars.php)
-
-* The documentation was edited by [Mardix](http://github.com/mardix).
 
 
 ####Contribution
