@@ -617,20 +617,13 @@ And now we can use the helper like this:
 * Fork of [Handlebars.php by XaminProject](https://github.com/XaminProject/handlebars.php)
 
 
-####Contribution
+#### Contribution
 
-Contributions are more than welcome, just don't forget to:
-
- * Add your name to each file that you edit as author
-
- * Use PHP CodeSniffer to check coding style.
+Contributions are more than welcome!
 
 ---
 
-####License
-
-
-    Copyright (C) 2012-2013 Xamin Project and contributors
+#### License
 
     Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 
