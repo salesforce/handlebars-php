@@ -1,7 +1,7 @@
 {
-    "name": "voodoophp/handlebars",
+    "name": "salesforce/handlebars-php",
     "description": "Handlebars processor for php",
-    "homepage": "http://voodoophp.org/docs/handlebars",
+    "homepage": "http://www.github.com/salesforce/handlebars-php",
     "keywords": ["templating", "mustache", "handlebars"],
     "type": "library",
     "license": "MIT",
