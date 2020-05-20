@@ -33,6 +33,11 @@ class Context
     protected $index = [];
 
     /**
+     * @var array dataStack stack for data within sections
+     */
+    protected $dataStack = [];
+
+    /**
      * @var array key stack for objects
      */
     protected $key = [];
@@ -74,6 +79,15 @@ class Context
     }
 
     /**
+     * Pushes data variables onto the stack. This is used to support @data variables.
+     * @param array $data Associative array where key is the name of the @data variable and value is the value.
+     */
+    public function pushData($data)
+    {
+        array_push($this->dataStack, $data);
+    }
+
+    /**
      * Push a Key onto the key stack
      *
      * @param string $key Key of the current object property.
@@ -106,6 +120,16 @@ class Context
     }
 
     /**
+     * Pop the last section data from the stack.
+     *
+     * @return array Last data
+     */
+    public function popData()
+    {
+        return array_pop($this->dataStack);
+    }
+
+    /**
      * Pop the last key from the stack.
      *
      * @return string Last key
@@ -123,26 +147,6 @@ class Context
     public function last()
     {
         return end($this->stack);
-    }
-
-    /**
-     * Get the index of current section item.
-     *
-     * @return mixed Last index
-     */
-    public function lastIndex()
-    {
-        return end($this->index);
-    }
-
-    /**
-     * Get the key of current object property.
-     *
-     * @return mixed Last key
-     */
-    public function lastKey()
-    {
-        return end($this->key);
     }
 
     /**
@@ -175,6 +179,12 @@ class Context
     {
         //Need to clean up
         $variableName = trim($variableName);
+
+        //Handle data variables (@index, @first, @last, etc)
+        if (substr($variableName, 0, 1) == '@') {
+            return $this->getDataVariable($variableName, $strict);
+        }
+
         $level = 0;
         while (substr($variableName, 0, 3) == '../') {
             $variableName = trim(substr($variableName, 3));
@@ -214,6 +224,71 @@ class Context
             }
         }
         return $current;
+    }
+
+    /**
+     * Given a data variable, retrieves the value associated.
+     *
+     * @param $variableName
+     * @param bool $strict
+     * @return mixed
+     */
+    public function getDataVariable($variableName, $strict = false)
+    {
+        $variableName = trim($variableName);
+
+        // make sure we get an at-symbol prefix
+        if (substr($variableName, 0, 1) != '@') {
+            if ($strict) {
+                throw new InvalidArgumentException(
+                    'can not find variable in context'
+                );
+            }
+            return '';
+        }
+
+        // Remove the at-symbol prefix
+        $variableName = substr($variableName, 1);
+
+        // determine the level of relative @data variables
+        $level = 0;
+        while (substr($variableName, 0, 3) == '../') {
+            $variableName = trim(substr($variableName, 3));
+            $level++;
+        }
+
+        // make sure the stack actually has the specified number of levels
+        if (count($this->dataStack) < $level) {
+            if ($strict) {
+                throw new InvalidArgumentException(
+                    'can not find variable in context'
+                );
+            }
+
+            return '';
+        }
+
+        // going from the top of the stack to the bottom, traverse the number of levels specified
+        end($this->dataStack);
+        while ($level) {
+            prev($this->dataStack);
+            $level--;
+        }
+
+        /** @var array $current */
+        $current = current($this->dataStack);
+
+        if (!array_key_exists($variableName, $current)) {
+            if ($strict) {
+                throw new InvalidArgumentException(
+                    'can not find variable in context'
+                );
+            }
+
+            return '';
+        }
+
+        return $current[$variableName];
     }
 
     /**

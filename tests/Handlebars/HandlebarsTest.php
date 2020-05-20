@@ -132,6 +132,51 @@ class HandlebarsTest extends \PHPUnit_Framework_TestCase
                 '23'
             ],
             [
+                '{{#each data}}{{@index}}{{/each}}',
+                ['data' => ['apple', 'banana', 'carrot', 'zucchini']],
+                '0123'
+            ],
+            [
+                '{{#each data}}{{@key}}{{/each}}',
+                ['data' => ['apple', 'banana', 'carrot', 'zucchini']],
+                '0123'
+            ],
+            [
+                '{{#each data}}{{#each this}}outer: {{@../key}},inner: {{@key}};{{/each}}{{/each}}',
+                ['data' => [['apple', 'banana'], ['carrot', 'zucchini']]],
+                'outer: 0,inner: 0;outer: 0,inner: 1;outer: 1,inner: 0;outer: 1,inner: 1;'
+            ],
+            [
+                '{{#each data}}{{#if @first}}true{{else}}false{{/if}}{{/each}}',
+                ['data' => ['apple', 'banana', 'carrot', 'zucchini']],
+                'truefalsefalsefalse'
+            ],
+            [
+                '{{#each data}}{{@first}}{{/each}}',
+                ['data' => ['apple', 'banana', 'carrot', 'zucchini']],
+                'truefalsefalsefalse'
+            ],
+            [
+                '{{#each data}}{{#each this}}outer: {{@../first}},inner: {{@first}};{{/each}}{{/each}}',
+                ['data' => [['apple', 'banana'], ['carrot', 'zucchini']]],
+                'outer: true,inner: true;outer: true,inner: false;outer: false,inner: true;outer: false,inner: false;'
+            ],
+            [
+                '{{#each data}}{{#if @last}}true{{else}}false{{/if}}{{/each}}',
+                ['data' => ['apple', 'banana', 'carrot', 'zucchini']],
+                'falsefalsefalsetrue'
+            ],
+            [
+                '{{#each data}}{{@last}}{{/each}}',
+                ['data' => ['apple', 'banana', 'carrot', 'zucchini']],
+                'falsefalsefalsetrue'
+            ],
+            [
+                '{{#each data}}{{#each this}}outer: {{@../last}},inner: {{@last}};{{/each}}{{/each}}',
+                ['data' => [['apple', 'banana'], ['carrot', 'zucchini']]],
+                'outer: false,inner: false;outer: false,inner: true;outer: true,inner: false;outer: true,inner: true;'
+            ],
+            [
                 '{{#upper data}}',
                 ['data' => "hello"],
                 'HELLO'

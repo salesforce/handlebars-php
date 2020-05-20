@@ -263,12 +263,27 @@ class Helpers
             if (is_array($tmp) && ! count($tmp)) {
                 return $this->renderElse($template, $context);
             } else {
+
+                $itemCount = -1;
+                if ($islist) {
+                    $itemCount = count($tmp);
+                }
+
                 foreach ($tmp as $key => $var) {
                     $tpl = clone $template;
                     if ($islist) {
                         $context->pushIndex($key);
+                        $context->pushData([
+                            'key' => $key,
+                            'index' => $key,
+                            'last' => $key == ($itemCount - 1),
+                            'first' => $key == 0,
+                        ]);
                     } else {
                         $context->pushKey($key);
+                        $context->pushData([
+                            'key' => $key,
+                        ]);
                     }
                     $context->push($var);
                     $tpl->setStopToken('else');
@@ -279,6 +294,7 @@ class Helpers
                     } else {
                         $context->popKey();
                     }
+                    $context->popData();
                 }
                 return $buffer;
             }

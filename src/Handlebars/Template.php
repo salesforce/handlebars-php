@@ -344,11 +344,13 @@ class Template
     {
         $name = $current[Tokenizer::NAME];
         $value = $context->get($name);
-        if ($name == '@index') {
-            return $context->lastIndex();
-        }
-        if ($name == '@key') {
-            return $context->lastKey();
+
+        if (substr(trim($name), 0, 1) == '@') {
+            $variable = $context->getDataVariable($name);
+            if (is_bool($variable)) {
+                return $variable ? 'true' : 'false';
+            }
+            return $variable;
         }
         if ($escaped) {
             $args = $this->handlebars->getEscapeArgs();
