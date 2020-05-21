@@ -46,20 +46,29 @@ class Context
     /**
      * @var bool enableDataVariables true if @data variables should be used.
      */
-    protected $enableDataVariables;
+    protected $enableDataVariables = false;
 
     /**
      * Mustache rendering Context constructor.
      *
      * @param mixed $context Default rendering context (default: null)
-     * @param bool $enableDataVariables Enables data variables (default: false)
+     * @param array $options Options for the context. It may contain the following: (default: empty array)
+     *                       enableDataVariables => Boolean, Enables @data variables (default: false)
      */
-    public function __construct($context = null, $enableDataVariables = false)
+    public function __construct($context = null, array $options = [])
     {
         if ($context !== null) {
             $this->stack = [$context];
         }
-        $this->enableDataVariables = $enableDataVariables;
+
+        if (isset($options['enableDataVariables'])) {
+            if (!is_bool($options['enableDataVariables'])) {
+                throw new InvalidArgumentException(
+                    'Context Constructor "enableDataVariables" option must be a boolean'
+                );
+            }
+            $this->enableDataVariables = $options['enableDataVariables'];
+        }
     }
 
     /**

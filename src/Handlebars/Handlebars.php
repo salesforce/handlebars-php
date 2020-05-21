@@ -100,6 +100,7 @@ class Handlebars
      * loader         => Loader object
      * partials_loader => Loader object
      * cache          => Cache object
+     * enableDataVariables => boolean. Enables @data variables (default: false)
      *
      * @param array $options array of options to set
      *

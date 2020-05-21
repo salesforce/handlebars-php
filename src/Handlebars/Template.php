@@ -122,7 +122,9 @@ class Template
     public function render($context)
     {
         if (!$context instanceof Context) {
-            $context = new Context($context, $this->handlebars->isDataVariablesEnabled());
+            $context = new Context($context, [
+                'enableDataVariables' => $this->handlebars->isDataVariablesEnabled(),
+            ]);
         }
         $topTree = end($this->stack); // never pop a value from stack
         list($index, $tree, $stop) = $topTree;
