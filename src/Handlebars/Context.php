@@ -18,6 +18,7 @@
 namespace Handlebars;
 
 use InvalidArgumentException;
+use LogicException;
 
 class Context
 {
@@ -43,15 +44,22 @@ class Context
     protected $key = [];
 
     /**
+     * @var bool enableDataVariables true if @data variables should be used.
+     */
+    protected $enableDataVariables;
+
+    /**
      * Mustache rendering Context constructor.
      *
      * @param mixed $context Default rendering context (default: null)
+     * @param bool $enableDataVariables Enables data variables (default: false)
      */
-    public function __construct($context = null)
+    public function __construct($context = null, $enableDataVariables = false)
     {
         if ($context !== null) {
             $this->stack = [$context];
         }
+        $this->enableDataVariables = $enableDataVariables;
     }
 
     /**
@@ -150,6 +158,26 @@ class Context
     }
 
     /**
+     * Get the index of current section item.
+     *
+     * @return mixed Last index
+     */
+    public function lastIndex()
+    {
+        return end($this->index);
+    }
+
+    /**
+     * Get the key of current object property.
+     *
+     * @return mixed Last key
+     */
+    public function lastKey()
+    {
+        return end($this->key);
+    }
+
+    /**
      * Change the current context to one of current context members
      *
      * @param string $variableName name of variable or a callable on current context
@@ -181,7 +209,7 @@ class Context
         $variableName = trim($variableName);
 
         //Handle data variables (@index, @first, @last, etc)
-        if (substr($variableName, 0, 1) == '@') {
+        if ($this->enableDataVariables && substr($variableName, 0, 1) == '@') {
             return $this->getDataVariable($variableName, $strict);
         }
 
@@ -235,6 +263,11 @@ class Context
      */
     public function getDataVariable($variableName, $strict = false)
     {
+        if (!$this->enableDataVariables) {
+            throw new LogicException('data variables are not supported due to the enableDataVariables configuration. Remove the call to data variables or change the setting.');
+        }
+
+
         $variableName = trim($variableName);
 
         // make sure we get an at-symbol prefix

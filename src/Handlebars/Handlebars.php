@@ -87,6 +87,11 @@ class Handlebars
     private $aliases = array();
 
     /**
+     * @var bool Enable @data variables
+     */
+    private $enableDataVariables = false;
+
+    /**
      * Handlebars engine constructor
      * $options array can contain :
      * helpers        => Helpers object
@@ -138,6 +143,15 @@ class Handlebars
             && is_array($options['partials_alias'])
         ) {
             $this->aliases = $options['partials_alias'];
+        }
+
+        if (isset($options['enableDataVariables'])) {
+            if (!is_bool($options['enableDataVariables'])) {
+                throw new InvalidArgumentException(
+                    'Handlebars Constructor "enableDataVariables" option must be a boolean'
+                );
+            }
+            $this->enableDataVariables = $options['enableDataVariables'];
         }
     }
 
@@ -416,6 +430,15 @@ class Handlebars
             $this->parser = new Parser();
         }
         return $this->parser;
+    }
+
+    /**
+     * Determines if the @data variables are enabled.
+     * @return bool
+     */
+    public function isDataVariablesEnabled()
+    {
+        return $this->enableDataVariables;
     }
 
     /**
