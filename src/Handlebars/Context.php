@@ -55,7 +55,7 @@ class Context
      * @param array $options Options for the context. It may contain the following: (default: empty array)
      *                       enableDataVariables => Boolean, Enables @data variables (default: false)
      */
-    public function __construct($context = null, array $options = [])
+    public function __construct($context = null, $options = [])
     {
         if ($context !== null) {
             $this->stack = [$context];
