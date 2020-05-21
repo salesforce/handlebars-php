@@ -273,17 +273,25 @@ class Helpers
                     $tpl = clone $template;
                     if ($islist) {
                         $context->pushIndex($key);
-                        $context->pushData([
-                            'key' => $key,
-                            'index' => $key,
-                            'last' => $key == ($itemCount - 1),
-                            'first' => $key == 0,
-                        ]);
+
+                        // If data variables are enabled, push the data related to this #each context
+                        if ($template->getEngine()->isDataVariablesEnabled()) {
+                            $context->pushData([
+                                'key' => $key,
+                                'index' => $key,
+                                'last' => $key == ($itemCount - 1),
+                                'first' => $key == 0,
+                            ]);
+                        }
                     } else {
                         $context->pushKey($key);
-                        $context->pushData([
-                            'key' => $key,
-                        ]);
+
+                        // If data variables are enabled, push the data related to this #each context
+                        if ($template->getEngine()->isDataVariablesEnabled()) {
+                            $context->pushData([
+                                'key' => $key,
+                            ]);
+                        }
                     }
                     $context->push($var);
                     $tpl->setStopToken('else');
@@ -294,7 +302,10 @@ class Helpers
                     } else {
                         $context->popKey();
                     }
-                    $context->popData();
+
+                    if ($template->getEngine()->isDataVariablesEnabled()) {
+                        $context->popData();
+                    }
                 }
                 return $buffer;
             }

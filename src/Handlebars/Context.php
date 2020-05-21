@@ -92,6 +92,9 @@ class Context
      */
     public function pushData($data)
     {
+        if (!$this->enableDataVariables) {
+            throw new LogicException('data variables are not supported due to the enableDataVariables configuration. Remove the call to data variables or change the setting.');
+        }
         array_push($this->dataStack, $data);
     }
 
@@ -134,6 +137,9 @@ class Context
      */
     public function popData()
     {
+        if (!$this->enableDataVariables) {
+            throw new LogicException('data variables are not supported due to the enableDataVariables configuration. Remove the call to data variables or change the setting.');
+        }
         return array_pop($this->dataStack);
     }
 
