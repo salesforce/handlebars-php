@@ -22,6 +22,10 @@ use LogicException;
 
 class Context
 {
+    const DATA_KEY = 'key';
+    const DATA_INDEX = 'index';
+    const DATA_FIRST = 'first';
+    const DATA_LAST = 'last';
 
     /**
      * @var array stack for context only top stack is available
@@ -61,13 +65,13 @@ class Context
             $this->stack = [$context];
         }
 
-        if (isset($options['enableDataVariables'])) {
-            if (!is_bool($options['enableDataVariables'])) {
+        if (isset($options[Handlebars::OPTION_ENABLE_DATA_VARIABLES])) {
+            if (!is_bool($options[Handlebars::OPTION_ENABLE_DATA_VARIABLES])) {
                 throw new InvalidArgumentException(
-                    'Context Constructor "enableDataVariables" option must be a boolean'
+                    'Context Constructor "' . Handlebars::OPTION_ENABLE_DATA_VARIABLES . '" option must be a boolean'
                 );
             }
-            $this->enableDataVariables = $options['enableDataVariables'];
+            $this->enableDataVariables = $options[Handlebars::OPTION_ENABLE_DATA_VARIABLES];
         }
     }
 
@@ -102,7 +106,7 @@ class Context
     public function pushData($data)
     {
         if (!$this->enableDataVariables) {
-            throw new LogicException('data variables are not supported due to the enableDataVariables configuration. Remove the call to data variables or change the setting.');
+            throw new LogicException('Data variables are not supported due to the enableDataVariables configuration. Remove the call to data variables or change the setting.');
         }
         array_push($this->dataStack, $data);
     }
@@ -147,7 +151,7 @@ class Context
     public function popData()
     {
         if (!$this->enableDataVariables) {
-            throw new LogicException('data variables are not supported due to the enableDataVariables configuration. Remove the call to data variables or change the setting.');
+            throw new LogicException('Data variables are not supported due to the enableDataVariables configuration. Remove the call to data variables or change the setting.');
         }
         return array_pop($this->dataStack);
     }
@@ -279,7 +283,7 @@ class Context
     public function getDataVariable($variableName, $strict = false)
     {
         if (!$this->enableDataVariables) {
-            throw new LogicException('data variables are not supported due to the enableDataVariables configuration. Remove the call to data variables or change the setting.');
+            throw new LogicException('Data variables are not supported due to the enableDataVariables configuration. Remove the call to data variables or change the setting.');
         }
 
 
@@ -289,7 +293,7 @@ class Context
         if (substr($variableName, 0, 1) != '@') {
             if ($strict) {
                 throw new InvalidArgumentException(
-                    'can not find variable in context'
+                    'Can not find variable in context'
                 );
             }
             return '';
@@ -309,7 +313,7 @@ class Context
         if (count($this->dataStack) < $level) {
             if ($strict) {
                 throw new InvalidArgumentException(
-                    'can not find variable in context'
+                    'Can not find variable in context'
                 );
             }
 
@@ -329,7 +333,7 @@ class Context
         if (!array_key_exists($variableName, $current)) {
             if ($strict) {
                 throw new InvalidArgumentException(
-                    'can not find variable in context'
+                    'Can not find variable in context'
                 );
             }
 

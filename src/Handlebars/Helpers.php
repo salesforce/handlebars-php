@@ -277,10 +277,10 @@ class Helpers
                         // If data variables are enabled, push the data related to this #each context
                         if ($template->getEngine()->isDataVariablesEnabled()) {
                             $context->pushData([
-                                'key' => $key,
-                                'index' => $key,
-                                'last' => $key == ($itemCount - 1),
-                                'first' => $key == 0,
+                                Context::DATA_KEY => $key,
+                                Context::DATA_INDEX => $key,
+                                Context::DATA_LAST => $key == ($itemCount - 1),
+                                Context::DATA_FIRST => $key == 0,
                             ]);
                         }
                     } else {
@@ -289,7 +289,7 @@ class Helpers
                         // If data variables are enabled, push the data related to this #each context
                         if ($template->getEngine()->isDataVariablesEnabled()) {
                             $context->pushData([
-                                'key' => $key,
+                                Context::DATA_KEY => $key,
                             ]);
                         }
                     }

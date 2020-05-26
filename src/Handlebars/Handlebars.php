@@ -25,6 +25,8 @@ class Handlebars
     private static $instance = null;
     const VERSION = '2.2';
 
+    const OPTION_ENABLE_DATA_VARIABLES = 'enableDataVariables';
+
     /**
      * factory method
      *
@@ -146,13 +148,13 @@ class Handlebars
             $this->aliases = $options['partials_alias'];
         }
 
-        if (isset($options['enableDataVariables'])) {
-            if (!is_bool($options['enableDataVariables'])) {
+        if (isset($options[self::OPTION_ENABLE_DATA_VARIABLES])) {
+            if (!is_bool($options[self::OPTION_ENABLE_DATA_VARIABLES])) {
                 throw new InvalidArgumentException(
-                    'Handlebars Constructor "enableDataVariables" option must be a boolean'
+                    'Handlebars Constructor "' . self::OPTION_ENABLE_DATA_VARIABLES . '" option must be a boolean'
                 );
             }
-            $this->enableDataVariables = $options['enableDataVariables'];
+            $this->enableDataVariables = $options[self::OPTION_ENABLE_DATA_VARIABLES];
         }
     }
 
