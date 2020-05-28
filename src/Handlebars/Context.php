@@ -58,6 +58,8 @@ class Context
      * @param mixed $context Default rendering context (default: null)
      * @param array $options Options for the context. It may contain the following: (default: empty array)
      *                       enableDataVariables => Boolean, Enables @data variables (default: false)
+     *
+     * @throws InvalidArgumentException when calling this method when enableDataVariables is not a boolean.
      */
     public function __construct($context = null, $options = [])
     {
@@ -102,6 +104,7 @@ class Context
     /**
      * Pushes data variables onto the stack. This is used to support @data variables.
      * @param array $data Associative array where key is the name of the @data variable and value is the value.
+     * @throws LogicException when calling this method without having enableDataVariables.
      */
     public function pushData($data)
     {
@@ -147,6 +150,7 @@ class Context
      * Pop the last section data from the stack.
      *
      * @return array Last data
+     * @throws LogicException when calling this method without having enableDataVariables.
      */
     public function popData()
     {
@@ -279,13 +283,13 @@ class Context
      * @param $variableName
      * @param bool $strict
      * @return mixed
+     * @throws LogicException when calling this method without having enableDataVariables.
      */
     public function getDataVariable($variableName, $strict = false)
     {
         if (!$this->enableDataVariables) {
             throw new LogicException('Data variables are not supported due to the enableDataVariables configuration. Remove the call to data variables or change the setting.');
         }
-
 
         $variableName = trim($variableName);
 
