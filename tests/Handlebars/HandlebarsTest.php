@@ -234,6 +234,24 @@ class HandlebarsTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($result, $engine->render($src, $data));
     }
 
+    public function testDataVariables1()
+    {
+        $object = new stdClass;
+        $object->{'@first'} = 'apple';
+        $object->{'@last'} = 'banana';
+        $object->{'@index'} = 'carrot';
+        $object->{'@unknown'} = 'zucchini';
+        $data = ['data' => [$object]];
+        $engine = new \Handlebars\Handlebars(array(
+            'loader' => new \Handlebars\Loader\StringLoader(),
+            'helpers' => new \Handlebars\Helpers(),
+            'enableDataVariables'=> false,
+        ));
+        $template = "{{#each data}}{{@first}}, {{@last}}, {{@index}}, {{@unknown}}{{/each}}";
+
+        $this->assertEquals("", $engine->render($template, $data));
+    }
+
     /**
      * Data provider for data variables
      * @return array
