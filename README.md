@@ -668,6 +668,96 @@ And now we can use the helper like this:
 
 ---
 
+## Data Variables for #each
+
+In Handlebars JS v1.1, data variables `@first` and `@last` were added for the #each helper. Due to the these variables
+not being backwards compatible, these data variables are disabled by default and must be enabled manually.
+
+To enable the new data variables, set the `enableDataVariables` option to `true` when instantiating the Handlebars
+instance.
+
+```php
+$handlebars = new Handlebars([
+    "loader" => $partialsLoader,
+    "partials_loader" => $partialsLoader,
+    "enableDataVariables" => true
+]);
+``` 
+
+Given the following template and data:
+```
+{{#each data}}{{#if @first}}FIRST: {{/if}}{{this}}<br>{{/each}}
+```
+```php
+'data' => ['apple', 'banana', 'carrot', 'zucchini']
+```
+The output will be
+```html
+FIRST: apple<br>banana<br>carrot<br>zucchini<br>
+```
+
+Given the following template and the data above:
+```
+{{#each data}}{{@first}}: {{this}}<br>{{/each}}
+```
+The output will be
+```html
+true: apple<br>banana<br>carrot<br>zucchini<br>
+```
+
+Data variables also support relative referencing within multiple #each statements.
+Given
+```
+{{#each data}}{{#each this}}outer: {{@../first}},inner: {{@first}};{{/each}}{{/each}}
+```
+```php
+'data' => [['apple', 'banana'], ['carrot', 'zucchini']]
+```
+The output will be 
+```
+outer: true,inner: true;outer: true,inner: false;outer: false,inner: true;outer: false,inner: false;
+```
+
+Be aware that when data variables are enabled, variables starting with `@` are considered restricted and will override
+values specified in the data.
+
+For example, given the following template and the following data, the output will be different depending on if data
+variables are enabled.
+
+```
+{{#each objects}}{{@first}}, {{@last}}, {{@index}}, {{@unknown}}{{/each}}
+```
+
+```php
+$object = new stdClass;
+$object->{'@first'} = 'apple';
+$object->{'@last'} = 'banana';
+$object->{'@index'} = 'carrot';
+$object->{'@unknown'} = 'zucchini';
+$data = ['objects' => [$object]];
+
+$engine = new \Handlebars\Handlebars(array(
+    'loader' => new \Handlebars\Loader\StringLoader(),
+    'helpers' => new \Handlebars\Helpers(),
+    'enableDataVariables'=> $enabled,
+));
+$engine->render($template, $data)
+``` 
+
+When `enableDataVariables` is `false`, existing behavior is not changed where some variables will be return. 
+
+```
+apple, banana, 0, zucchini
+```
+
+
+When `enableDataVariables` is `true`, the behavior matches HandlebarsJS 1.1 behavior, where all data variables replace
+variables defined in the data and any data variable prefixed with `@` that is unknown will be blank.
+
+```
+true, true, 0,
+```
+
 
 #### Credits
 

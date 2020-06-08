@@ -263,12 +263,35 @@ class Helpers
             if (is_array($tmp) && ! count($tmp)) {
                 return $this->renderElse($template, $context);
             } else {
+
+                $itemCount = -1;
+                if ($islist) {
+                    $itemCount = count($tmp);
+                }
+
                 foreach ($tmp as $key => $var) {
                     $tpl = clone $template;
                     if ($islist) {
                         $context->pushIndex($key);
+
+                        // If data variables are enabled, push the data related to this #each context
+                        if ($template->getEngine()->isDataVariablesEnabled()) {
+                            $context->pushData([
+                                Context::DATA_KEY => $key,
+                                Context::DATA_INDEX => $key,
+                                Context::DATA_LAST => $key == ($itemCount - 1),
+                                Context::DATA_FIRST => $key == 0,
+                            ]);
+                        }
                     } else {
                         $context->pushKey($key);
+
+                        // If data variables are enabled, push the data related to this #each context
+                        if ($template->getEngine()->isDataVariablesEnabled()) {
+                            $context->pushData([
+                                Context::DATA_KEY => $key,
+                            ]);
+                        }
                     }
                     $context->push($var);
                     $tpl->setStopToken('else');
@@ -278,6 +301,10 @@ class Helpers
                         $context->popIndex();
                     } else {
                         $context->popKey();
+                    }
+
+                    if ($template->getEngine()->isDataVariablesEnabled()) {
+                        $context->popData();
                     }
                 }
                 return $buffer;

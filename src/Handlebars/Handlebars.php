@@ -25,6 +25,8 @@ class Handlebars
     private static $instance = null;
     const VERSION = '2.2';
 
+    const OPTION_ENABLE_DATA_VARIABLES = 'enableDataVariables';
+
     /**
      * factory method
      *
@@ -87,6 +89,11 @@ class Handlebars
     private $aliases = array();
 
     /**
+     * @var bool Enable @data variables
+     */
+    private $enableDataVariables = false;
+
+    /**
      * Handlebars engine constructor
      * $options array can contain :
      * helpers        => Helpers object
@@ -95,6 +102,7 @@ class Handlebars
      * loader         => Loader object
      * partials_loader => Loader object
      * cache          => Cache object
+     * enableDataVariables => boolean. Enables @data variables (default: false)
      *
      * @param array $options array of options to set
      *
@@ -138,6 +146,15 @@ class Handlebars
             && is_array($options['partials_alias'])
         ) {
             $this->aliases = $options['partials_alias'];
+        }
+
+        if (isset($options[self::OPTION_ENABLE_DATA_VARIABLES])) {
+            if (!is_bool($options[self::OPTION_ENABLE_DATA_VARIABLES])) {
+                throw new InvalidArgumentException(
+                    'Handlebars Constructor "' . self::OPTION_ENABLE_DATA_VARIABLES . '" option must be a boolean'
+                );
+            }
+            $this->enableDataVariables = $options[self::OPTION_ENABLE_DATA_VARIABLES];
         }
     }
 
@@ -416,6 +433,15 @@ class Handlebars
             $this->parser = new Parser();
         }
         return $this->parser;
+    }
+
+    /**
+     * Determines if the @data variables are enabled.
+     * @return bool
+     */
+    public function isDataVariablesEnabled()
+    {
+        return $this->enableDataVariables;
     }
 
     /**

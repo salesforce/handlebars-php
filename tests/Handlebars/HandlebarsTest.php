@@ -215,6 +215,180 @@ class HandlebarsTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @param string $src
+     * @param array $data
+     * @param string $result
+     * @param bool $enableDataVariables
+     * @dataProvider internalDataVariablesDataProvider
+     */
+    public function testDataVariables($src, $data, $result, $enableDataVariables)
+    {
+        $loader = new \Handlebars\Loader\StringLoader();
+        $helpers = new \Handlebars\Helpers();
+        $engine = new \Handlebars\Handlebars(array(
+            'loader' => $loader,
+            'helpers' => $helpers,
+            'enableDataVariables'=> $enableDataVariables,
+        ));
+
+        $this->assertEquals($result, $engine->render($src, $data));
+    }
+
+    public function testDataVariables1()
+    {
+        $object = new stdClass;
+        $object->{'@first'} = 'apple';
+        $object->{'@last'} = 'banana';
+        $object->{'@index'} = 'carrot';
+        $object->{'@unknown'} = 'zucchini';
+        $data = ['data' => [$object]];
+        $engine = new \Handlebars\Handlebars(array(
+            'loader' => new \Handlebars\Loader\StringLoader(),
+            'helpers' => new \Handlebars\Helpers(),
+            'enableDataVariables'=> false,
+        ));
+        $template = "{{#each data}}{{@first}}, {{@last}}, {{@index}}, {{@unknown}}{{/each}}";
+
+        $this->assertEquals("", $engine->render($template, $data));
+    }
+
+    /**
+     * Data provider for data variables
+     * @return array
+     */
+    public function internalDataVariablesDataProvider()
+    {
+        // Build a standard set of objects to test against
+        $keyPropertyName = '@key';
+        $firstPropertyName = '@first';
+        $lastPropertyName = '@last';
+        $unknownPropertyName = '@unknown';
+        $objects = [];
+        foreach (['apple', 'banana', 'carrot', 'zucchini'] as $itemValue) {
+            $object = new stdClass();
+            $object->$keyPropertyName = $itemValue;
+            $object->$firstPropertyName = $itemValue;
+            $object->$lastPropertyName = $itemValue;
+            $object->$unknownPropertyName = $itemValue;
+            $objects[] = $object;
+        }
+
+        // Build a list of scenarios. These will be used later to build fanned out scenarios that will be used against
+        // the test. Each entry represents two different tests: (1) when enableDataVariables is enabled and (2) not enabled.
+        $scenarios = [
+            [
+                'src' => '{{#each data}}{{@index}}{{/each}}',
+                'data' => ['data' => ['apple', 'banana', 'carrot', 'zucchini']],
+                // @index should work the same regardless of the feature flag
+                'outputNotEnabled' => '0123',
+                'outputEnabled' => '0123',
+            ],
+            [
+                'src' => '{{#each data}}{{@key}}{{/each}}',
+                'data' => ['data' => ['apple', 'banana', 'carrot', 'zucchini']],
+                'outputNotEnabled' => '',
+                'outputEnabled' => '0123'
+            ],
+            [
+                'src' => '{{#each data}}{{#each this}}outer: {{@../key}},inner: {{@key}};{{/each}}{{/each}}',
+                'data' => ['data' => [['apple', 'banana'], ['carrot', 'zucchini']]],
+                'outputNotEnabled' => 'outer: ,inner: ;outer: ,inner: ;outer: ,inner: ;outer: ,inner: ;',
+                'outputEnabled' => 'outer: 0,inner: 0;outer: 0,inner: 1;outer: 1,inner: 0;outer: 1,inner: 1;',
+            ],
+            [
+                'src' => '{{#each data}}{{#if @first}}true{{else}}false{{/if}}{{/each}}',
+                'data' => ['data' => ['apple', 'banana', 'carrot', 'zucchini']],
+                'outputNotEnabled' => 'falsefalsefalsefalse',
+                'outputEnabled' => 'truefalsefalsefalse',
+            ],
+            [
+                'src' => '{{#each data}}{{@first}}{{/each}}',
+                'data' => ['data' => ['apple', 'banana', 'carrot', 'zucchini']],
+                'outputNotEnabled' => '',
+                'outputEnabled' => 'truefalsefalsefalse',
+            ],
+            [
+                'src' => '{{#each data}}{{#each this}}outer: {{@../first}},inner: {{@first}};{{/each}}{{/each}}',
+                'data' => ['data' => [['apple', 'banana'], ['carrot', 'zucchini']]],
+                'outputNotEnabled' => 'outer: ,inner: ;outer: ,inner: ;outer: ,inner: ;outer: ,inner: ;',
+                'outputEnabled' => 'outer: true,inner: true;outer: true,inner: false;outer: false,inner: true;outer: false,inner: false;',
+            ],
+            [
+                'src' => '{{#each data}}{{#if @last}}true{{else}}false{{/if}}{{/each}}',
+                'data' => ['data' => ['apple', 'banana', 'carrot', 'zucchini']],
+                'outputNotEnabled' => 'falsefalsefalsefalse',
+                'outputEnabled' => 'falsefalsefalsetrue'
+            ],
+            [
+                'src' => '{{#each data}}{{@last}}{{/each}}',
+                'data' => ['data' => ['apple', 'banana', 'carrot', 'zucchini']],
+                'outputNotEnabled' => '',
+                'outputEnabled' => 'falsefalsefalsetrue'
+            ],
+            [
+                'src' => '{{#each data}}{{#each this}}outer: {{@../last}},inner: {{@last}};{{/each}}{{/each}}',
+                'data' => ['data' => [['apple', 'banana'], ['carrot', 'zucchini']]],
+                'outputNotEnabled' => 'outer: ,inner: ;outer: ,inner: ;outer: ,inner: ;outer: ,inner: ;',
+                'outputEnabled' => 'outer: false,inner: false;outer: false,inner: true;outer: true,inner: false;outer: true,inner: true;'
+            ],
+            [
+                // @index variables are ignored and the data variable is used
+                'src' => '{{#each data}}{{@index}}{{/each}}',
+                'data' => ['data' => [['@index' => 'apple'], ['@index' => 'banana'], ['@index' => 'carrot'], ['@index' => 'zucchini']]],
+                'outputNotEnabled' => '0123',
+                'outputEnabled' => '0123'
+            ],
+            [
+                // @key variables are ignored and the data variable is used
+                'src' => '{{#each data}}{{@index}}{{/each}}',
+                'data' => ['data' => $objects],
+                'outputNotEnabled' => '0123',
+                'outputEnabled' => '0123'
+            ],
+            [
+                // @first variables are used when data variables are not enabled.
+                'src' => '{{#each data}}{{@first}}{{/each}}',
+                'data' => ['data' => $objects],
+                'outputNotEnabled' => 'applebananacarrotzucchini',
+                'outputEnabled' => 'truefalsefalsefalse'
+            ],
+            [
+                // @last variables are used when data variables are not enabled.
+                'src' => '{{#each data}}{{@last}}{{/each}}',
+                'data' => ['data' => $objects],
+                'outputNotEnabled' => 'applebananacarrotzucchini',
+                'outputEnabled' => 'falsefalsefalsetrue'
+            ],
+            [
+                // @unknown variables are used when data variables are not enabled however since "unknown" is not a valid
+                // value it should ignored.
+                'src' => '{{#each data}}{{@unknown}}{{/each}}',
+                'data' => ['data' => $objects],
+                'outputNotEnabled' => 'applebananacarrotzucchini',
+                'outputEnabled' => ''
+            ],
+        ];
+
+        // Build out a test case for when the enableDataVariables feature is enabled and when it's not
+        $fannedOutScenarios = [];
+        foreach ($scenarios as $scenario) {
+            $fannedOutScenarios['not enabled: ' . $scenario['src']] = [
+                $scenario['src'],
+                $scenario['data'],
+                $scenario['outputNotEnabled'],
+                false,
+            ];
+            $fannedOutScenarios['enabled: ' . $scenario['src']] = [
+                $scenario['src'],
+                $scenario['data'],
+                $scenario['outputEnabled'],
+                true,
+            ];
+        }
+        return $fannedOutScenarios;
+    }
+
+    /**
      * Management helpers
      */
     public function testHelpersManagement()

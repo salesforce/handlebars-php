@@ -122,7 +122,9 @@ class Template
     public function render($context)
     {
         if (!$context instanceof Context) {
-            $context = new Context($context);
+            $context = new Context($context, [
+                'enableDataVariables' => $this->handlebars->isDataVariablesEnabled(),
+            ]);
         }
         $topTree = end($this->stack); // never pop a value from stack
         list($index, $tree, $stop) = $topTree;
@@ -344,12 +346,27 @@ class Template
     {
         $name = $current[Tokenizer::NAME];
         $value = $context->get($name);
-        if ($name == '@index') {
-            return $context->lastIndex();
+
+        // If @data variables are enabled, use the more complex algorithm for handling the the variables otherwise
+        // use the previous version.
+        if ($this->handlebars->isDataVariablesEnabled()) {
+            if (substr(trim($name), 0, 1) == '@') {
+                $variable = $context->getDataVariable($name);
+                if (is_bool($variable)) {
+                    return $variable ? 'true' : 'false';
+                }
+                return $variable;
+            }
+        } else {
+            // If @data variables are not enabled, then revert back to legacy behavior
+            if ($name == '@index') {
+                return $context->lastIndex();
+            }
+            if ($name == '@key') {
+                return $context->lastKey();
+            }
         }
-        if ($name == '@key') {
-            return $context->lastKey();
-        }
+
         if ($escaped) {
             $args = $this->handlebars->getEscapeArgs();
             array_unshift($args, $value);

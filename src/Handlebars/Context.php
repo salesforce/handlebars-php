@@ -18,9 +18,14 @@
 namespace Handlebars;
 
 use InvalidArgumentException;
+use LogicException;
 
 class Context
 {
+    const DATA_KEY = 'key';
+    const DATA_INDEX = 'index';
+    const DATA_FIRST = 'first';
+    const DATA_LAST = 'last';
 
     /**
      * @var array stack for context only top stack is available
@@ -33,19 +38,42 @@ class Context
     protected $index = [];
 
     /**
+     * @var array dataStack stack for data within sections
+     */
+    protected $dataStack = [];
+
+    /**
      * @var array key stack for objects
      */
     protected $key = [];
 
     /**
+     * @var bool enableDataVariables true if @data variables should be used.
+     */
+    protected $enableDataVariables = false;
+
+    /**
      * Mustache rendering Context constructor.
      *
      * @param mixed $context Default rendering context (default: null)
+     * @param array $options Options for the context. It may contain the following: (default: empty array)
+     *                       enableDataVariables => Boolean, Enables @data variables (default: false)
+     *
+     * @throws InvalidArgumentException when calling this method when enableDataVariables is not a boolean.
      */
-    public function __construct($context = null)
+    public function __construct($context = null, $options = [])
     {
         if ($context !== null) {
             $this->stack = [$context];
+        }
+
+        if (isset($options[Handlebars::OPTION_ENABLE_DATA_VARIABLES])) {
+            if (!is_bool($options[Handlebars::OPTION_ENABLE_DATA_VARIABLES])) {
+                throw new InvalidArgumentException(
+                    'Context Constructor "' . Handlebars::OPTION_ENABLE_DATA_VARIABLES . '" option must be a boolean'
+                );
+            }
+            $this->enableDataVariables = $options[Handlebars::OPTION_ENABLE_DATA_VARIABLES];
         }
     }
 
@@ -71,6 +99,19 @@ class Context
     public function pushIndex($index)
     {
         array_push($this->index, $index);
+    }
+
+    /**
+     * Pushes data variables onto the stack. This is used to support @data variables.
+     * @param array $data Associative array where key is the name of the @data variable and value is the value.
+     * @throws LogicException when calling this method without having enableDataVariables.
+     */
+    public function pushData($data)
+    {
+        if (!$this->enableDataVariables) {
+            throw new LogicException('Data variables are not supported due to the enableDataVariables configuration. Remove the call to data variables or change the setting.');
+        }
+        array_push($this->dataStack, $data);
     }
 
     /**
@@ -103,6 +144,20 @@ class Context
     public function popIndex()
     {
         return array_pop($this->index);
+    }
+
+    /**
+     * Pop the last section data from the stack.
+     *
+     * @return array Last data
+     * @throws LogicException when calling this method without having enableDataVariables.
+     */
+    public function popData()
+    {
+        if (!$this->enableDataVariables) {
+            throw new LogicException('Data variables are not supported due to the enableDataVariables configuration. Remove the call to data variables or change the setting.');
+        }
+        return array_pop($this->dataStack);
     }
 
     /**
@@ -175,6 +230,12 @@ class Context
     {
         //Need to clean up
         $variableName = trim($variableName);
+
+        //Handle data variables (@index, @first, @last, etc)
+        if ($this->enableDataVariables && substr($variableName, 0, 1) == '@') {
+            return $this->getDataVariable($variableName, $strict);
+        }
+
         $level = 0;
         while (substr($variableName, 0, 3) == '../') {
             $variableName = trim(substr($variableName, 3));
@@ -214,6 +275,76 @@ class Context
             }
         }
         return $current;
+    }
+
+    /**
+     * Given a data variable, retrieves the value associated.
+     *
+     * @param $variableName
+     * @param bool $strict
+     * @return mixed
+     * @throws LogicException when calling this method without having enableDataVariables.
+     */
+    public function getDataVariable($variableName, $strict = false)
+    {
+        if (!$this->enableDataVariables) {
+            throw new LogicException('Data variables are not supported due to the enableDataVariables configuration. Remove the call to data variables or change the setting.');
+        }
+
+        $variableName = trim($variableName);
+
+        // make sure we get an at-symbol prefix
+        if (substr($variableName, 0, 1) != '@') {
+            if ($strict) {
+                throw new InvalidArgumentException(
+                    'Can not find variable in context'
+                );
+            }
+            return '';
+        }
+
+        // Remove the at-symbol prefix
+        $variableName = substr($variableName, 1);
+
+        // determine the level of relative @data variables
+        $level = 0;
+        while (substr($variableName, 0, 3) == '../') {
+            $variableName = trim(substr($variableName, 3));
+            $level++;
+        }
+
+        // make sure the stack actually has the specified number of levels
+        if (count($this->dataStack) < $level) {
+            if ($strict) {
+                throw new InvalidArgumentException(
+                    'Can not find variable in context'
+                );
+            }
+
+            return '';
+        }
+
+        // going from the top of the stack to the bottom, traverse the number of levels specified
+        end($this->dataStack);
+        while ($level) {
+            prev($this->dataStack);
+            $level--;
+        }
+
+        /** @var array $current */
+        $current = current($this->dataStack);
+
+        if (!array_key_exists($variableName, $current)) {
+            if ($strict) {
+                throw new InvalidArgumentException(
+                    'Can not find variable in context'
+                );
+            }
+
+            return '';
+        }
+
+        return $current[$variableName];
     }
 
     /**
