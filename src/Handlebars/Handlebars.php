@@ -18,14 +18,15 @@ namespace Handlebars;
 use Handlebars\Loader\StringLoader;
 use Handlebars\Cache\Dummy;
 use InvalidArgumentException;
-
+use BadFunctionCallException;
 
 class Handlebars
 {
     private static $instance = null;
-    const VERSION = '2.2';
+    const VERSION = '2.4';
 
     const OPTION_ENABLE_DATA_VARIABLES = 'enableDataVariables';
+    const OPTION_ENABLE_GETTEXT = 'enableGettext';
 
     /**
      * factory method
@@ -94,6 +95,12 @@ class Handlebars
     private $enableDataVariables = false;
 
     /**
+     * @var bool Enable gettext support for {{_ "abc"}} & {{ngettext "country" "countries" 2}}
+     */
+    private $enableGettext = false;
+
+
+    /**
      * Handlebars engine constructor
      * $options array can contain :
      * helpers        => Helpers object
@@ -103,6 +110,7 @@ class Handlebars
      * partials_loader => Loader object
      * cache          => Cache object
      * enableDataVariables => boolean. Enables @data variables (default: false)
+     * enableGettext => boolean. Enables gettext support (default: false)
      *
      * @param array $options array of options to set
      *
@@ -155,6 +163,20 @@ class Handlebars
                 );
             }
             $this->enableDataVariables = $options[self::OPTION_ENABLE_DATA_VARIABLES];
+        }
+
+        if (isset($options[self::OPTION_ENABLE_GETTEXT])) {
+            if (!is_bool($options[self::OPTION_ENABLE_GETTEXT])) {
+                throw new InvalidArgumentException(
+                    'Handlebars Constructor "' . self::OPTION_ENABLE_GETTEXT . '" option must be a boolean'
+                );
+            }
+            if (!function_exists('gettext')) {
+                throw new BadFunctionCallException(
+                    'Handlebars Constructor "' . self::OPTION_ENABLE_GETTEXT . '" is true but PHP is lacking gettext support'
+                );
+            }
+            $this->enableGettext = $options[self::OPTION_ENABLE_GETTEXT];
         }
     }
 
@@ -402,7 +424,9 @@ class Handlebars
     public function getTokenizer()
     {
         if (! isset($this->tokenizer)) {
-            $this->tokenizer = new Tokenizer();
+            $this->tokenizer = new Tokenizer([
+                'enableGettext' => $this->isGettextEnabled()
+            ]);
         }
 
         return $this->tokenizer;
@@ -442,6 +466,15 @@ class Handlebars
     public function isDataVariablesEnabled()
     {
         return $this->enableDataVariables;
+    }
+
+    /**
+     * Determines if gettext support is enabled.
+     * @return bool
+     */
+    public function isGettextEnabled()
+    {
+        return $this->enableGettext;
     }
 
     /**

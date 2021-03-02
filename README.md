@@ -758,6 +758,31 @@ variables defined in the data and any data variable prefixed with `@` that is un
 true, true, 0,
 ```
 
+---
+
+## Gettext support
+
+To use PHPs builtin gettext support with Handlebars, as already done in other languages, support for {{_ "msgid"}}
+and ngettext for plural forms ({{ngettext "singular message ID" "plural message ID" count}}) has been added.
+Due to the these variables not being standardized, support is disabled by default and must be enabled manually.
+
+To enable gettext support, set the `enableGettext` option to `true` when instantiating the Handlebars instance.
+
+```php
+$handlebars = new Handlebars([
+    "enableGettext" => true
+]);
+``` 
+
+Examples:
+```
+<button>{{_ "Sign in"}}</button>
+
+<p>{{count}} {{ngettext "country" "countries" count}}</p>
+```
+
+Template strings can be extracted for example with:
+[xgettext-template](https://github.com/gmarty/xgettext)
 
 #### Credits
 

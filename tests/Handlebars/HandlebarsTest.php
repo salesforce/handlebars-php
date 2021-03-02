@@ -32,7 +32,7 @@ class HandlebarsTest extends \PHPUnit_Framework_TestCase
     public function testBasicTags($src, $data, $result)
     {
         $loader = new \Handlebars\Loader\StringLoader();
-        $engine = new \Handlebars\Handlebars(array('loader' => $loader));
+        $engine = new \Handlebars\Handlebars(array('loader' => $loader, 'enableGettext' => true));
         $this->assertEquals($result, $engine->render($src, $data));
     }
 
@@ -249,7 +249,7 @@ class HandlebarsTest extends \PHPUnit_Framework_TestCase
         ));
         $template = "{{#each data}}{{@first}}, {{@last}}, {{@index}}, {{@unknown}}{{/each}}";
 
-        $this->assertEquals("", $engine->render($template, $data));
+        $this->assertEquals("apple, banana, 0, zucchini", $engine->render($template, $data));
     }
 
     /**
@@ -386,6 +386,23 @@ class HandlebarsTest extends \PHPUnit_Framework_TestCase
             ];
         }
         return $fannedOutScenarios;
+    }
+
+    /**
+     * Gettext test, only if support is enabled
+     * As we don't have translation files, we expect gettext to just return the
+     * MessageID which confirms gettext is working
+     * Could be improved to test ALL standard functions with gettext enabled?
+     */
+    public function testGettext()
+    {
+        if (function_exists('gettext')) {
+            $loader = new \Handlebars\Loader\StringLoader();
+            $engine = new \Handlebars\Handlebars(array('enableGettext' => true));
+            $template = '{{_ "sing ular"}} {{ngettext "singular" "plural" 2}} {{without}} {{#capitalize title}} {{ngettext}}';
+            $data = ["without" => "gettext", "title" => "gettext", "ngettext" => "incomplete"];
+            $this->assertEquals("sing ular plural gettext Gettext incomplete", $engine->render($template, $data));
+        }
     }
 
     /**

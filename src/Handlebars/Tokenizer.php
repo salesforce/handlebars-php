@@ -34,10 +34,12 @@ class Tokenizer
     const T_PARTIAL = '>';
     const T_PARTIAL_2 = '<';
     const T_DELIM_CHANGE = '=';
-    const T_ESCAPED = '_v';
+    const T_ESCAPED = '€'; // was _v - why? breaks T_TEXT & T_GETTEXT
     const T_UNESCAPED = '{';
     const T_UNESCAPED_2 = '&';
-    const T_TEXT = '_t';
+    const T_TEXT = '|'; //  was _t - why? breaks T_ESCAPED & T_GETTEXT
+    const T_GETTEXT = '_';
+    const T_NGETTEXT = 'ngettext';
 
     // Valid token types
     private $tagTypes = [
@@ -50,7 +52,7 @@ class Tokenizer
         self::T_DELIM_CHANGE => true,
         self::T_ESCAPED => true,
         self::T_UNESCAPED => true,
-        self::T_UNESCAPED_2 => true,
+        self::T_UNESCAPED_2 => true
     ];
 
     // Interpolated tags
@@ -58,6 +60,8 @@ class Tokenizer
         self::T_ESCAPED => true,
         self::T_UNESCAPED => true,
         self::T_UNESCAPED_2 => true,
+        self::T_GETTEXT => true,
+        self::T_NGETTEXT => true
     ];
 
     // Token properties
@@ -81,6 +85,32 @@ class Tokenizer
     protected $lineStart;
     protected $otag;
     protected $ctag;
+
+    /**
+     * Mustache tokenizer constructor.
+     *
+     * @param array $options Options for the context. It may contain the following: (default: empty array)
+     *                       enableGettext => Boolean, Enables gettext support (default: false)
+     *
+     * @throws InvalidArgumentException when calling this method when enableGettext is not a boolean.
+     */
+    public function __construct($options = [])
+    {
+        if (isset($options[Handlebars::OPTION_ENABLE_GETTEXT])) {
+            if (!is_bool($options[Handlebars::OPTION_ENABLE_GETTEXT])) {
+                throw new InvalidArgumentException(
+                    'Context Constructor "' . Handlebars::OPTION_ENABLE_GETTEXT . '" option must be a boolean'
+                );
+            }
+            $this->enableGettext = $options[Handlebars::OPTION_ENABLE_GETTEXT];
+            if ($this->enableGettext) {
+                $this->tagTypes[self::T_GETTEXT] = true;
+                $this->tagTypes[self::T_NGETTEXT] = true;
+            }
+
+        }
+    }
+
 
     /**
      * Scan and tokenize template source.
@@ -133,7 +163,6 @@ class Tokenizer
                     break;
 
                 case self::IN_TAG_TYPE:
-
                     $i += $openingTagLength - 1;
                     if (isset($this->tagTypes[$text[$i + 1]])) {
                         $tag = $text[$i + 1];
@@ -162,12 +191,21 @@ class Tokenizer
 
                 default:
                     if ($character === $firstClosingTagCharacter && $this->tagChange($this->ctag, $text, $i, $closingTagLength)) {
+                        if ($this->enableGettext) {
+                            // Check for ngettext, longer than usual tagname
+                            $newBuffer = explode(' ', trim($this->buffer), 2);
+                            if ((count($newBuffer) == 2) && ($newBuffer[0] == self::T_NGETTEXT)) {
+                                $this->tagType = self::T_NGETTEXT;
+                            }
+                        }
                         // Sections (Helpers) can accept parameters
                         // Same thing for Partials (little known fact)
+                        // As well as for ngettext
                         if (in_array($this->tagType, [
                                 self::T_SECTION,
                                 self::T_PARTIAL,
-                                self::T_PARTIAL_2]
+                                self::T_PARTIAL_2,
+                                self::T_NGETTEXT]
                         )) {
                             $newBuffer = explode(' ', trim($this->buffer), 2);
                             $args = '';
