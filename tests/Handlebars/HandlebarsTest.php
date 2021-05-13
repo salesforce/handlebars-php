@@ -32,7 +32,7 @@ class HandlebarsTest extends \PHPUnit_Framework_TestCase
     public function testBasicTags($src, $data, $result)
     {
         $loader = new \Handlebars\Loader\StringLoader();
-        $engine = new \Handlebars\Handlebars(array('loader' => $loader, 'enableGettext' => true));
+        $engine = new \Handlebars\Handlebars(array('loader' => $loader, 'enableGettext' => false));
         $this->assertEquals($result, $engine->render($src, $data));
     }
 
@@ -48,6 +48,11 @@ class HandlebarsTest extends \PHPUnit_Framework_TestCase
                 '{{! This is comment}}',
                 array(),
                 ''
+            ),
+           array(
+                '\{{escaped}}',
+                array(),
+                '{{escaped}}'
             ),
             array(
                 '{{data}}',

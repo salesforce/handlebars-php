@@ -171,7 +171,7 @@ class Handlebars
                     'Handlebars Constructor "' . self::OPTION_ENABLE_GETTEXT . '" option must be a boolean'
                 );
             }
-            if (!function_exists('gettext')) {
+            if ($options[self::OPTION_ENABLE_GETTEXT] === true && !function_exists('gettext')) {
                 throw new BadFunctionCallException(
                     'Handlebars Constructor "' . self::OPTION_ENABLE_GETTEXT . '" is true but PHP is lacking gettext support'
                 );
