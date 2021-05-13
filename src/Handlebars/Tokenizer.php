@@ -41,6 +41,9 @@ class Tokenizer
     const T_GETTEXT = '_';
     const T_NGETTEXT = 'ngettext';
 
+    // Handlebars tokens can be escaped: \{{
+    const ESCAPE_CHAR = '\\';
+
     // Valid token types
     private $tagTypes = [
         self::T_SECTION => true,
@@ -148,6 +151,15 @@ class Tokenizer
             switch ($this->state) {
 
                 case self::IN_TEXT:
+
+                    // escape char found, check if token follows
+                    // and skip if so
+                    if ($character == self::ESCAPE_CHAR && $text[$i+1] === $firstOpeningTagCharacter) {
+                        $this->buffer .= $text[$i+1];
+                        $i++;
+                        break;
+                    }
+
                     if ($character === $firstOpeningTagCharacter && $this->tagChange($this->otag, $text, $i, $openingTagLength)
                     ) {
                         $i--;
@@ -251,7 +263,6 @@ class Tokenizer
                     }
                     break;
             }
-
         }
 
         $this->filterLine(true);

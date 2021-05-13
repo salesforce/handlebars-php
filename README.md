@@ -630,6 +630,15 @@ You can use comments in your handlebars code just as you would in your code. Sin
 
 ---
 
+### Escaping Handlebars expressions
+Handlebars content may be escaped inline by prefixing a mustache block with `\`.
+
+```html
+\{{escaped}}
+```
+
+---
+
 ### Partials
 
 Partials are other templates you can include inside of the main template.
