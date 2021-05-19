@@ -123,7 +123,7 @@ class Template
     {
         if (!$context instanceof Context) {
             $context = new Context($context, [
-                'enableDataVariables' => $this->handlebars->isDataVariablesEnabled(),
+                'enableDataVariables' => $this->handlebars->isDataVariablesEnabled()
             ]);
         }
         $topTree = end($this->stack); // never pop a value from stack
@@ -171,6 +171,13 @@ class Template
                 break;
             case Tokenizer::T_TEXT:
                 $buffer .= $current[Tokenizer::VALUE];
+                break;
+            case Tokenizer::T_GETTEXT:
+                $buffer .= gettext(trim($current["name"], "\""));
+                break;
+            case Tokenizer::T_NGETTEXT:
+                $newArgs = explode(' ', $current["args"]);
+                $buffer .= ngettext(trim($newArgs[0], "\""), trim($newArgs[1], "\""), $newArgs[2]);
                 break;
             default:
                 throw new RuntimeException(
