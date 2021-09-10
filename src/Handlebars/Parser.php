@@ -71,6 +71,17 @@ class Parser
                             && isset($result[Tokenizer::NAME])
                             && $result[Tokenizer::NAME] == $token[Tokenizer::NAME]
                         ) {
+
+                            // $result is the open section
+                            // $token is the close section
+
+                            // We need to compact the whitespace control so that the single node represents both the
+                            // open and close nodes in the template.
+                            $openWhitespaceAfter = $result[Tokenizer::STRIP_WHITESPACE_AFTER];
+                            $result[Tokenizer::STRIP_WHITESPACE_AFTER] = $token[Tokenizer::STRIP_WHITESPACE_AFTER];
+                            $result[Tokenizer::STRIP_WHITESPACE_BEFORE_CONTENT] = $openWhitespaceAfter;
+                            $result[Tokenizer::STRIP_WHITESPACE_AFTER_CONTENT] = $token[Tokenizer::STRIP_WHITESPACE_BEFORE];
+
                             $result[Tokenizer::NODES] = $newNodes;
                             $result[Tokenizer::END] = $token[Tokenizer::INDEX];
                             array_push($stack, $result);

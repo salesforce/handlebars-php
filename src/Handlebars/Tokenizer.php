@@ -38,6 +38,7 @@ class Tokenizer
     const T_UNESCAPED = '{';
     const T_UNESCAPED_2 = '&';
     const T_TEXT = '_t';
+    const T_WHITESPACE_CONTROL = '~';
 
     // Valid token types
     private $tagTypes = [
@@ -71,6 +72,12 @@ class Tokenizer
     const NODES = 'nodes';
     const VALUE = 'value';
     const ARGS = 'args';
+    const ORIGINAL_NAME = 'originalName';
+    const ORIGINAL_ARGS = 'originalArgs';
+    const STRIP_WHITESPACE_BEFORE = 'stripWhitespaceBefore';
+    const STRIP_WHITESPACE_AFTER = 'stripWhitespaceAfter';
+    const STRIP_WHITESPACE_BEFORE_CONTENT = 'stripWhitespaceBeforeContent';
+    const STRIP_WHITESPACE_AFTER_CONTENT = 'stripWhitespaceAfterContent';
 
     protected $state;
     protected $tagType;
@@ -81,6 +88,7 @@ class Tokenizer
     protected $lineStart;
     protected $otag;
     protected $ctag;
+    protected $startsWithWhitespaceControl;
 
     /**
      * Scan and tokenize template source.
@@ -123,6 +131,7 @@ class Tokenizer
                         $i--;
                         $this->flushBuffer();
                         $this->state = self::IN_TAG_TYPE;
+                        $this->startsWithWhitespaceControl = false; // always reset when starting a new tag
                     } else {
                         if ($character == "\n") {
                             $this->filterLine();
@@ -134,7 +143,15 @@ class Tokenizer
 
                 case self::IN_TAG_TYPE:
 
+                    // skip the opening delimiter
                     $i += $openingTagLength - 1;
+
+                    // skip the whitespace control character
+                    if ($text[$i + 1] === self::T_WHITESPACE_CONTROL) {
+                        $this->startsWithWhitespaceControl = true;
+                        $i++;
+                    }
+
                     if (isset($this->tagTypes[$text[$i + 1]])) {
                         $tag = $text[$i + 1];
                         $this->tagType = $tag;
@@ -162,6 +179,14 @@ class Tokenizer
 
                 default:
                     if ($character === $firstClosingTagCharacter && $this->tagChange($this->ctag, $text, $i, $closingTagLength)) {
+
+                        // Check to see if the mustache tag has whitespace control to remove whitespace after
+                        $endsWithWhitespaceControl = false;
+                        if (strlen($this->buffer) > 0 && $this->buffer[strlen($this->buffer) - 1] === self::T_WHITESPACE_CONTROL) {
+                            $endsWithWhitespaceControl = true;
+                            $this->buffer = substr($this->buffer, 0, -1);
+                        }
+
                         // Sections (Helpers) can accept parameters
                         // Same thing for Partials (little known fact)
                         if (in_array($this->tagType, [
@@ -176,6 +201,31 @@ class Tokenizer
                             }
                             $this->buffer = $newBuffer[0];
                         }
+
+                        // In order to keep backwards compatibility when whitespace control is not enabled, the original
+                        // name of the variable must include the whitespace control characters (~).
+                        if ($this->tagType === self::T_ESCAPED) {
+                            $originalName = $this->buffer;
+                            if ($this->startsWithWhitespaceControl) {
+                                $originalName = self::T_WHITESPACE_CONTROL . $originalName;
+                            }
+                            if ($endsWithWhitespaceControl) {
+                                $originalName = $originalName . self::T_WHITESPACE_CONTROL;
+                            }
+                        }
+
+                        // For arguments, backwards compatibility means adding the whitespace control character (~) to
+                        // either the end of the args or the end of the tag name.
+                        if (isset($args) && $endsWithWhitespaceControl &&
+                            ($this->tagType === self::T_SECTION || $this->tagType === self::T_PARTIAL || $this->tagType === self::T_PARTIAL_2)) {
+                            // No args were specified with the partial so append to the end of tag, like {{> header~}}
+                            if (strlen($args) === 0) {
+                                $originalName = $this->buffer . self::T_WHITESPACE_CONTROL;
+                            } else {
+                                $originalArgs = $args . self::T_WHITESPACE_CONTROL;
+                            }
+                        }
+
                         $t = [
                             self::TYPE => $this->tagType,
                             self::NAME => trim($this->buffer),
@@ -184,13 +234,22 @@ class Tokenizer
                             self::INDEX => ($this->tagType == self::T_END_SECTION) ?
                                 $this->seenTag - $openingTagLength :
                                 $i + strlen($this->ctag),
+                            self::STRIP_WHITESPACE_BEFORE => $this->startsWithWhitespaceControl,
+                            self::STRIP_WHITESPACE_AFTER => $endsWithWhitespaceControl,
                         ];
                         if (isset($args)) {
                             $t[self::ARGS] = $args;
                         }
+                        if (isset($originalName)) {
+                            $t[self::ORIGINAL_NAME] = $originalName;
+                        }
+                        if (isset($originalArgs)) {
+                            $t[self::ORIGINAL_ARGS] = $originalArgs;
+                        }
                         $this->tokens[] = $t;
                         unset($t);
                         unset($args);
+                        $this->startsWithWhitespaceControl = false;
                         $this->buffer = '';
                         $i += strlen($this->ctag) - 1;
                         $this->state = self::IN_TEXT;
@@ -237,6 +296,7 @@ class Tokenizer
         $this->lineStart = 0;
         $this->otag = '{{';
         $this->ctag = '}}';
+        $this->startsWithWhitespaceControl = false;
     }
 
     /**

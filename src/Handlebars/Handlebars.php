@@ -26,6 +26,7 @@ class Handlebars
     const VERSION = '2.2';
 
     const OPTION_ENABLE_DATA_VARIABLES = 'enableDataVariables';
+    const OPTION_ENABLE_WHITESPACE_CONTROL = 'enableWhitespaceControl';
 
     /**
      * factory method
@@ -94,6 +95,11 @@ class Handlebars
     private $enableDataVariables = false;
 
     /**
+     * @var bool Enable "~" to strip whitespace before and after tags
+     */
+    private $enableWhitespaceControl = false;
+
+    /**
      * Handlebars engine constructor
      * $options array can contain :
      * helpers        => Helpers object
@@ -103,6 +109,7 @@ class Handlebars
      * partials_loader => Loader object
      * cache          => Cache object
      * enableDataVariables => boolean. Enables @data variables (default: false)
+     * enableWhitespaceControl => boolean. Enables whitespace control using "~" within tags. (default: false)
      *
      * @param array $options array of options to set
      *
@@ -155,6 +162,15 @@ class Handlebars
                 );
             }
             $this->enableDataVariables = $options[self::OPTION_ENABLE_DATA_VARIABLES];
+        }
+
+        if (isset($options[self::OPTION_ENABLE_WHITESPACE_CONTROL])) {
+            if (!is_bool($options[self::OPTION_ENABLE_WHITESPACE_CONTROL])) {
+                throw new InvalidArgumentException(
+                    'Handlebars Constructor "' . self::OPTION_ENABLE_WHITESPACE_CONTROL . '" option must be a boolean'
+                );
+            }
+            $this->enableWhitespaceControl = $options[self::OPTION_ENABLE_WHITESPACE_CONTROL];
         }
     }
 
@@ -442,6 +458,15 @@ class Handlebars
     public function isDataVariablesEnabled()
     {
         return $this->enableDataVariables;
+    }
+
+    /**
+     * Determines if whitespace control using "~" is enabled.
+     * @return bool
+     */
+    public function isWhitespaceControlEnabled()
+    {
+        return $this->enableWhitespaceControl;
     }
 
     /**
