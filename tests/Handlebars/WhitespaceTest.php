@@ -92,97 +92,17 @@ class WhitespaceTest extends PHPUnit_Framework_TestCase
                 'data' => $data,
                 'enabled' => ' abara ',
                 'disabled' => " a\n\n\nbar \n\n\na "
-            ], /* [
-                'template' => ' {{~^if foo~}} bar {{~/if~}} ',
-                'data' => $data,
-                'enabled' => 'bar',
-                'disabled' => '  bar  '
             ], [
-                'template' => ' {{^if foo~}} bar {{/if~}} ',
-                'data' => $data,
-                'enabled' => ' bar ',
-                'disabled' => '  bar  '
-            ], [
-                'template' => ' {{~^if foo}} bar {{~/if}} ',
-                'data' => $data,
-                'enabled' => ' bar ',
-                'disabled' => '  bar  '
-            ], [
-                'template' => ' {{^if foo}} bar {{/if}} ',
-                'data' => $data,
-                'enabled' => '  bar  ',
-                'disabled' => '  bar  '
-            ], [
-                'template' => " \n\n{{~^if foo~}} \n\nbar \n\n{{~/if~}}\n\n ",
-                'data' => $data,
-                'enabled' => 'bar',
-                'disabled' => " \n\n \n\nbar \n\n\n\n "
-            ], [
-                'template' => '{{#if foo~}} bar {{~^~}} baz {{~/if}}',
-                'data' => $data,
-                'enabled' => 'bar',
-                'disabled' => ' bar '
-            ], [
-                'template' => '{{#if foo~}} bar {{^~}} baz {{/if}}',
-                'data' => $data,
-                'enabled' => 'bar ',
-                'disabled' => ' bar '
-            ], [
-                'template' => '{{#if foo}} bar {{~^~}} baz {{~/if}}',
-                'data' => $data,
-                'enabled' => ' bar ',
-                'disabled' => ' bar '
-            ], [
-                'template' => '{{#if foo}} bar {{^~}} baz {{/if}}',
-                'data' => $data,
-                'enabled' => ' bar ',
-                'disabled' => ' bar '
-            ],*/ [
                 'template' => '{{#if foo~}} bar {{~else~}} baz {{~/if}}',
                 'data' => $data,
                 'enabled' => 'bar',
                 'disabled' => ' bar ~caz~ baz ' // {{~else~}} is evaluated as a variable
-            ], /* [
-                'template' => "\n\n{{~#if foo~}} \n\nbar \n\n{{~^~}} \n\nbaz \n\n{{~/if~}}\n\n",
-                'data' => $data,
-                'enabled' => 'bar',
-                'disabled' => ' bar~ ~caz~ baz '
             ], [
-                'template' => "\n\n{{~#if foo~}} \n\n{{{foo}}} \n\n{{~^~}} \n\nbaz \n\n{{~/if~}}\n\n",
-                'data' => $data,
-                'enabled' => 'bar',
-                'disabled' => ' bar~ ~caz~ baz '
-            ], [
-                'template' => '{{#if foo~}} bar {{~^~}} baz {{~/if}}',
-                'data' => [],
-                'enabled' => 'baz',
-                'disabled' => ' bar~ ~caz~ baz '
-            ], [
-                'template' => '{{#if foo}} bar {{~^~}} baz {{/if}}',
-                'data' => [],
-                'enabled' => 'baz ',
-                'disabled' => ' bar~ ~caz~ baz '
-            ], [
-                'template' => '{{#if foo~}} bar {{~^}} baz {{~/if}}',
-                'data' => [],
-                'enabled' => ' baz',
-                'disabled' => ' bar~ ~caz~ baz '
-            ], [
-                'template' => '{{#if foo~}} bar {{~^}} baz {{/if}}',
-                'data' => [],
-                'enabled' => ' baz ',
-                'disabled' => ' bar~ ~caz~ baz '
-            ],*/ [
                 'template' => '{{#if foo~}} bar {{~else~}} baz {{~/if}}',
                 'data' => [],
                 'enabled' => 'baz',
                 'disabled' => ''
-            ], /* [
-                'template' => "\n\n{{~#if foo~}} \n\nbar \n\n{{~^~}} \n\nbaz \n\n{{~/if~}}\n\n",
-                'data' => [],
-                'enabled' => 'baz',
-                'disabled' => ''
-            ], */ [
+            ], [
                 'template' => 'foo {{~> dude~}} ',
                 'data' => [],
                 'partials' => [
