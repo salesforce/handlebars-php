@@ -147,9 +147,13 @@ class Tokenizer
                     $i += $openingTagLength - 1;
 
                     // skip the whitespace control character
-                    if ($text[$i + 1] === self::T_WHITESPACE_CONTROL) {
+                    if (strlen($text) >= $i + 1 && $text[$i + 1] === self::T_WHITESPACE_CONTROL) {
                         $this->startsWithWhitespaceControl = true;
                         $i++;
+                    } else if (strlen($text) >= $i + 2 && $text[$i + 1] === self::T_UNESCAPED && $text[$i + 2] === self::T_WHITESPACE_CONTROL) {
+                        // handle {{{~foo}}} case
+                        $this->startsWithWhitespaceControl = true;
+                        $text = substr($text, 0, $i + 2) . substr($text, $i + 3);
                     }
 
                     if (isset($this->tagTypes[$text[$i + 1]])) {
@@ -204,7 +208,7 @@ class Tokenizer
 
                         // In order to keep backwards compatibility when whitespace control is not enabled, the original
                         // name of the variable must include the whitespace control characters (~).
-                        if ($this->tagType === self::T_ESCAPED) {
+                        if ($this->tagType === self::T_ESCAPED || $this->tagType === self::T_UNESCAPED) {
                             $originalName = $this->buffer;
                             if ($this->startsWithWhitespaceControl) {
                                 $originalName = self::T_WHITESPACE_CONTROL . $originalName;

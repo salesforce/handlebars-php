@@ -202,6 +202,18 @@ class Template
             case Tokenizer::T_UNESCAPED:
             case Tokenizer::T_UNESCAPED_2:
                 $newValue = $this->variables($context, $current, false);
+                if ($this->handlebars->isWhitespaceControlEnabled()) {
+                    if ($mustStripWhitespaceBefore || $this->isArrayValueTrue($current, Tokenizer::STRIP_WHITESPACE_BEFORE)) {
+                        $buffer = $this->stripTrailingWhitespace($buffer);
+                        $newValue = $this->stripLeadingWhitespace($newValue);
+                    }
+                    if ($this->isArrayValueTrue($current, Tokenizer::STRIP_WHITESPACE_AFTER_CONTENT)) {
+                        $newValue = $this->stripTrailingWhitespace($newValue);
+                    }
+
+                    // Make sure the next nodes to strip before
+                    $mustStripWhitespaceBefore = $this->isArrayValueTrue($current, Tokenizer::STRIP_WHITESPACE_AFTER);
+                }
                 $buffer .= $newValue;
                 break;
             case Tokenizer::T_ESCAPED:

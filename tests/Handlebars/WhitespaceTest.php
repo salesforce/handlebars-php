@@ -141,6 +141,21 @@ class WhitespaceTest extends PHPUnit_Framework_TestCase
                 'data' => ['foo' => 'bar', '~foo~' => '~bar~'],
                 'enabled' => 'barbar bar ',
                 'disabled' => ' ~bar~ bar bar '
+            ], [
+                'template' => ' {{{~foo~}}} ',
+                'data' => ['foo' => 'bar<', '~foo~' => '~bar<~'],
+                'enabled' => 'bar<',
+                'disabled' => ' ~bar<~ '
+            ], [
+                'template' => ' {{{~foo}}} ',
+                'data' => ['foo' => 'bar<', '~foo' => '~bar<'],
+                'enabled' => 'bar< ',
+                'disabled' => ' ~bar< '
+            ], [
+                'template' => ' {{{foo~}}} ',
+                'data' => ['foo' => 'bar<', 'foo~' => 'bar<~'],
+                'enabled' => ' bar<',
+                'disabled' => ' bar<~ '
             ]
         ];
 
