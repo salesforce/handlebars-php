@@ -270,8 +270,10 @@ You can use the if helper to conditionally render a block. If its argument retur
 ```html
 {{#if isActive}}
     This part will be shown if it is active
+{{#else if isValid}}
+    This part will be shown if it is valid
 {{else}}
-    This part will not show if isActive is true
+    This part will be shown if isActive and isValid are both "falsy" values
 {{/if}}
 ```
 
@@ -279,7 +281,8 @@ You can use the if helper to conditionally render a block. If its argument retur
 <?php
 
 $model = [
-    "isActive" => true
+    "isActive" => true,
+    "isValid" => false
 ];
 
 echo $handlebars->render($template, $model);
@@ -449,8 +452,10 @@ $model = [
 ```html
 {{#if isActive}}
     This part will be shown if it is active
+{{#else if isValid}}
+    This part will be shown if it is valid
 {{else}}
-    This part will not show if isActive is true
+    This part will be shown if isActive and isValid are both "falsy" values
 {{/if}}
 ```
 
