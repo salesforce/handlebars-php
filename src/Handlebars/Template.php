@@ -145,7 +145,7 @@ class Template
                 $newStack = isset($current[Tokenizer::NODES])
                     ? $current[Tokenizer::NODES] : [];
                 array_push($this->stack, [0, $newStack, false]);
-                $buffer .= $this->section($context, $current);
+                $buffer .= $this->postprocess($this->section($context, $current));
                 array_pop($this->stack);
                 break;
             case Tokenizer::T_INVERTED :
@@ -164,10 +164,10 @@ class Template
                 break;
             case Tokenizer::T_UNESCAPED:
             case Tokenizer::T_UNESCAPED_2:
-                $buffer .= $this->variables($context, $current, false);
+                $buffer .= $this->postprocess($this->variables($context, $current, false));
                 break;
             case Tokenizer::T_ESCAPED:
-                $buffer .= $this->variables($context, $current, true);
+                $buffer .= $this->postprocess($this->variables($context, $current, true));
                 break;
             case Tokenizer::T_TEXT:
                 $buffer .= $current[Tokenizer::VALUE];
@@ -376,14 +376,26 @@ class Template
             );
         }
 
-        if ($this->handlebars->getPostprocess()) {
-            $value = call_user_func(
-                $this->handlebars->getPostprocess(),
-                $value
-            );
+        return $value;
+    }
+
+    /**
+     * Post process value
+     *
+     * @param string $value input value
+     *
+     * @return string postprocess result of value
+     */
+    private function postprocess($value)
+    {
+        if (!$this->handlebars->getPostprocess()) {
+            return $value;
         }
 
-        return $value;
+        return call_user_func(
+            $this->handlebars->getPostprocess(),
+            $value
+        );
     }
 
     public function __clone()
