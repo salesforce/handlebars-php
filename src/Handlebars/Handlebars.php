@@ -86,6 +86,11 @@ class Handlebars
         'UTF-8'
     );
 
+    /**
+     * @var callable postprocess function to use
+     */
+    private $postprocess;
+
     private $aliases = array();
 
     /**
@@ -140,6 +145,15 @@ class Handlebars
                 $options['escapeArgs'] = array($options['escapeArgs']);
             }
             $this->escapeArgs = $options['escapeArgs'];
+        }
+
+        if (isset($options['postprocess'])) {
+            if (!is_callable($options['postprocess'])) {
+                throw new InvalidArgumentException(
+                    'Handlebars Constructor "postprocess" option must be callable'
+                );
+            }
+            $this->postprocess = $options['postprocess'];
         }
 
         if (isset($options['partials_alias'])
@@ -379,6 +393,32 @@ class Handlebars
         $this->escapeArgs = $escapeArgs;
     }
 
+    /**
+     * Get current postprocess function
+     *
+     * @return callable
+     */
+    public function getPostprocess()
+    {
+        return $this->postprocess;
+    }
+
+    /**
+     * Set current postprocess function
+     *
+     * @param callable $postprocess function
+     * @throws \InvalidArgumentException
+     * @return void
+     */
+    public function setPostprocess($postprocess)
+    {
+        if (!is_callable($postprocess)) {
+            throw new InvalidArgumentException(
+                'Postprocess function must be a callable'
+            );
+        }
+        $this->postprocess = $postprocess;
+    }
 
     /**
      * Set the Handlebars Tokenizer instance.

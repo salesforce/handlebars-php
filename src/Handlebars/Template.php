@@ -376,6 +376,13 @@ class Template
             );
         }
 
+        if ($this->handlebars->getPostprocess()) {
+            $value = call_user_func(
+                $this->handlebars->getPostprocess(),
+                $value
+            );
+        }
+
         return $value;
     }
 
