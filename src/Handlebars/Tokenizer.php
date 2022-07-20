@@ -98,6 +98,11 @@ class Tokenizer
 
         $this->reset();
 
+        // Coerce NULL to empty string before passing to trim().
+        if ($delimiters === null) {
+            $delimiters = '';
+        }
+
         if ($delimiters = trim($delimiters)) {
             list($otag, $ctag) = explode(' ', $delimiters);
             $this->otag = $otag;
