@@ -3,7 +3,7 @@
 /**
  * Class AutoloaderTest
  */
-class HandlebarsTest extends \PHPUnit_Framework_TestCase
+class HandlebarsTest extends PHPUnit\Framework\TestCase
 {
     /**
      * Test handlebars autoloader
