@@ -1,3 +1,5 @@
+[![PHPUnit](https://github.com/kpeeksf/handlebars-php/actions/workflows/ci.yml/badge.svg)](https://github.com/kpeeksf/handlebars-php/actions/workflows/ci.yml)
+
 ---
 
 #handlebars-php
