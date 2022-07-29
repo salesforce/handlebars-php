@@ -1,4 +1,4 @@
-[![PHPUnit](https://github.com/kpeeksf/handlebars-php/actions/workflows/ci.yml/badge.svg)](https://github.com/kpeeksf/handlebars-php/actions/workflows/ci.yml)
+[![PHPUnit](https://github.com/salesforce/handlebars-php/actions/workflows/ci.yml/badge.svg)](https://github.com/salesforce/handlebars-php/actions/workflows/ci.yml)
 
 ---
 
