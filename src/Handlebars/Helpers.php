@@ -299,7 +299,7 @@ class Helpers
         $tmp = $context->get($keyname);
 
         if (is_array($tmp) || $tmp instanceof Traversable) {
-            $tmp = array_slice($tmp, $slice_start ?? 0, $slice_end);
+            $tmp = array_slice($tmp, $slice_start ?? 0, $slice_end, true);
             $buffer = '';
             $islist = array_values($tmp) === $tmp;
 
