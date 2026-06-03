@@ -272,7 +272,7 @@ You can use the if helper to conditionally render a block. If its argument retur
 ```html
 {{#if isActive}}
     This part will be shown if it is active
-{{#else if isValid}}
+{{else if isValid}}
     This part will be shown if it is valid
 {{else}}
     This part will be shown if isActive and isValid are both "falsy" values
@@ -454,7 +454,7 @@ $model = [
 ```html
 {{#if isActive}}
     This part will be shown if it is active
-{{#else if isValid}}
+{{else if isValid}}
     This part will be shown if it is valid
 {{else}}
     This part will be shown if isActive and isValid are both "falsy" values
