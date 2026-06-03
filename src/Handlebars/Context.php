@@ -365,12 +365,16 @@ class Context
         } elseif (is_array($variable)) {
             if (isset($variable[$inside])) {
                 $value = $variable[$inside];
+            } elseif ($strict) {
+                throw new InvalidArgumentException('can not find variable in context');
             }
         } elseif (is_object($variable)) {
             if (isset($variable->$inside)) {
                 $value = $variable->$inside;
             } elseif (is_callable(array($variable, $inside))) {
                 $value = call_user_func(array($variable, $inside));
+            } elseif ($strict) {
+                throw new InvalidArgumentException('can not find variable in context');
             }
         } elseif ($inside === '.') {
             $value = $variable;
