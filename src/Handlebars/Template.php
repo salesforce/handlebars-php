@@ -319,7 +319,25 @@ class Template
         $partial = $this->handlebars->loadPartial($current[Tokenizer::NAME]);
 
         if ($current[Tokenizer::ARGS]) {
-            $context = $context->get($current[Tokenizer::ARGS]);
+            $args = explode(' ', $current[Tokenizer::ARGS]);
+            $newContext = [];
+            foreach ($args as $arg) {
+                $kv = explode('=', $arg, 2);
+                if (count($kv) == 1) {
+                    if (count($args) > 1) {
+                        throw new RuntimeException(
+                            $current[Tokenizer::NAME] . ' call has invalid syntax'
+                        );
+                    }
+                    $value = trim($kv[0]);
+                    $newContext = $context->get($value);
+                } else {
+                    $key = trim($kv[0]);
+                    $value = trim($kv[1]);
+                    $newContext[$key] = $context->get($value);
+                }
+            }
+            $context = $newContext;
         }
 
         return $partial->render($context);
