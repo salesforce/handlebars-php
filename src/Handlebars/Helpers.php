@@ -228,7 +228,7 @@ class Helpers
         if ($tmp) {
             $token = 'else';
             foreach ($tree[0]['nodes'] as $node) {
-                $name = trim($node['name'] ?? '');
+                $name = trim(isset($node['name']) ? $node['name'] : '');
                 if ($name && substr($name, 0, 7) == 'else if') {
                     $token = $node['name'];
                     break;
@@ -250,7 +250,7 @@ class Helpers
                     $token = 'else';
                     $remains = array_slice($tree[0]['nodes'], $key + 1);
                     foreach ($remains as $remain) {
-                        $name = trim($remain['name'] ?? '');
+                        $name = trim(isset($remain['name']) ? $remain['name'] : '');
                         if ($name && substr($name, 0, 7) == 'else if') {
                             $token = $remain['name'];
                             break;
@@ -299,7 +299,7 @@ class Helpers
         $tmp = $context->get($keyname);
 
         if (is_array($tmp) || $tmp instanceof Traversable) {
-            $tmp = array_slice($tmp, $slice_start ?? 0, $slice_end, true);
+            $tmp = array_slice($tmp, isset($slice_start) ? $slice_start : 0, $slice_end, true);
             $buffer = '';
             $islist = array_values($tmp) === $tmp;
 
